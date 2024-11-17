@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+        <h1>Formularz</h1>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <form onsubmit="save(event)" id="formularz">
+        <div class="mb-3">
+          <label for="name" class="form-label">Nazwa Firmy</label>
+          <input type="text" class="form-control" id="name" required>
+        </div>
+        <div class="mb-3">
+          <label for="nip" class="form-label">NIP</label>
+          <input type="number" class="form-control" id="nip" required>
+        </div>
+        <div class="mb-3">
+            <label for="city" class="form-label">Miasto</label>
+            <input type="text" class="form-control" id="city" required>
+          </div>
+          <div class="mb-3">
+            <label for="street" class="form-label">Ulica</label>
+            <input type="text" class="form-control" id="street" required>
+          </div>
+          <div class="mb-3">
+            <label for="housenumber" class="form-label">Numer domu</label>
+            <input type="text" class="form-control" id="housenumber" required>
+          </div>
+          <div class="mb-3">
+            <label for="flatnumber" class="form-label">Numer mieszkania</label>
+            <input type="text" class="form-control" id="flatnumber">
+          </div>
+          <div class="mb-3">
+            <label for="areacode" class="form-label">Kod pocztowy</label>
+            <input type="text" class="form-control" id="areacode" required>
+          </div>
+          <div class="form-floating">
+            <textarea class="form-control" placeholder="Napisz jeżeli masz jakieś uwagi" id="text_area"></textarea>
+            <label for="text_area">Napisz jeżeli masz jakieś uwagi</label>
+          </div>
+          <br>
+          <div class="form-floating">
+            <select class="form-select" id="industry" aria-label="Branża" required>
+              <option selected></option>
+              <option value="1">Informatyczna</option>
+              <option value="2">Energetyczna</option>
+              <option value="3">Gospodarcza</option>
+            </select>
+            <label for="floatingSelect">Branża</label>
+          </div><br>
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="check">
+          <label class="form-check-label" for="check">Aktywny</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Wyślij</button>
+        <button type="submit" class="btn btn-primary">Zapisz</button>
+        <button type="button" class="btn btn-primary" onclick="wstaw()">Wstaw</button>
+      </form>
+      <script>
+        function save() { 
+            event = event.preventDefault();
+            let newCustomer = {
+                name: document.getElementById("name").value,
+                nip: document.getElementById("nip").value,
+                city: document.getElementById("city").value,
+                street: document.getElementById("street").value,
+                housenumber: document.getElementById("housenumber").value,
+                flatnumber: document.getElementById("flatnumber").value,
+                areacode: document.getElementById("areacode").value,
+                industry: document.getElementById("industry").value,
+                check: document.getElementById("check").value
+            };
+            console.log(newCustomer);
+        };
+        function wstaw(){
+           let newCustomer = {
+            name: "Adam",
+            nip: 1234,
+            city: "Katowice",
+            street: "Rakowicka",
+            areacode: "12-123",
+            comments: "example text",
+            industry: 2,
+           }
+            document.getElementById("name").value = newCustomer.name
+            document.getElementById("nip").value = newCustomer.nip
+            document.getElementById("city").value = newCustomer.city
+            document.getElementById("street").value = newCustomer.street
+            document.getElementById("areacode").value = newCustomer.areacode
+            document.getElementById("industry").value = newCustomer.industry
+            document.getElementById("text_area").value = newCustomer.comments
+            document.getElementById("check").value = newCustomer.active
+        }
+
+      </script>
+  </body>
+</html>
