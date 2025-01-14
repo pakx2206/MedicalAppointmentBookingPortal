@@ -1,0 +1,34 @@
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1rem;
+
+    .day {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+
+        strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .hour {
+            padding: 0.3rem;
+            margin: 0.1rem 0;
+            cursor: pointer;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .available {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .booked {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    }
+}

@@ -1,0 +1,18 @@
+<header>
+  <nav>
+    <a routerLink="/">Strona główna</a>
+    <a routerLink="/register">Rejestracja</a>
+    <a *ngIf="currentUser" routerLink="/appointment">Umów wizytę</a>
+    <a *ngIf="!currentUser" routerLink="/login">Logowanie</a>
+    <a *ngIf="currentUser" routerLink="/profile">Profil</a>
+    <button *ngIf="currentUser" (click)="logout()">Wyloguj</button>
+  </nav>
+</header>
+
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+<footer>
+  <p>&copy; 2025 Medical Appointment Booking Portal. Patryk Pacocha, Michał Warzocha.</p>
+</footer>

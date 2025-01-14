@@ -1,0 +1,70 @@
+<div class="form-container">
+    <h2>Rejestracja</h2>
+
+    <div *ngIf="currentUser; else registrationFormTemplate">
+        <p>Jesteś już zalogowany <strong>{{ currentUser.name }}</strong>.</p>
+        <p>Jeżeli chcesz zarejestrować nowe konto, wyloguj się z obecnego.</p>
+    </div>
+
+    <ng-template #registrationFormTemplate>
+        <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+            <label>
+                Imię:
+                <input type="text" formControlName="name" />
+                <small *ngIf="registrationForm.get('name')?.invalid && registrationForm.get('name')?.touched">
+                    Imię jest wymagane.
+                </small>
+            </label>
+
+            <label>
+                E-mail:
+                <input type="email" formControlName="email" />
+                <small *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched">
+                    Podaj poprawny e-mail.
+                </small>
+            </label>
+
+            <label>
+                Hasło:
+                <input type="password" formControlName="password" />
+                <small *ngIf="registrationForm.get('password')?.invalid && registrationForm.get('password')?.touched">
+                    Hasło musi posiadać minimalnie 6 znaków.
+                </small>
+            </label>
+
+            <label>
+                Wiek:
+                <input type="number" formControlName="age" />
+                <small *ngIf="registrationForm.get('age')?.invalid && registrationForm.get('age')?.touched">
+                    Musisz posiadać 18 lat, aby dokonać rejestracji.
+                </small>
+            </label>
+
+            <label>
+                Miasto:
+                <input type="text" formControlName="city" />
+                <small *ngIf="registrationForm.get('city')?.invalid && registrationForm.get('city')?.touched">
+                    Miasto jest wymagane.
+                </small>
+            </label>
+
+            <label>
+                Telefon kontaktowy:
+                <input type="text" formControlName="phone" />
+                <small *ngIf="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched">
+                    Podaj poprawny numer telefonu.
+                </small>
+            </label>
+
+            <label>
+                <input type="checkbox" formControlName="terms" />
+                Zgadzam się na rejestracje w serwisie.
+                <small *ngIf="registrationForm.get('terms')?.invalid && registrationForm.get('terms')?.touched">
+                    Aby ukończyć rejestrację, musisz zaakceptować.
+                </small>
+            </label>
+
+            <button type="submit" [disabled]="registrationForm.invalid">Zarejestruj</button>
+        </form>
+    </ng-template>
+</div>

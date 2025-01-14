@@ -1,0 +1,49 @@
+.form-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 15px;
+
+        input[type='text'],
+        input[type='email'],
+        input[type='password'],
+        input[type='number'] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        small {
+            color: red;
+            font-size: 0.8rem;
+        }
+    }
+
+    button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    }
+}

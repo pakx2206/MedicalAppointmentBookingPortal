@@ -1,0 +1,15 @@
+<div class="calendar">
+    <div class="day" *ngFor="let day of daysInMonth">
+      <strong>{{ day.date | date: 'dd MMMM' }}</strong>
+      <div
+        *ngFor="let hour of hours"
+        class="hour"
+        [class.available]="!day.appointments.includes(hour + ':00')"
+        [class.booked]="day.appointments.includes(hour + ':00')"
+        (click)="bookAppointment(day.date, hour)"
+      >
+        {{ hour }}:00
+      </div>
+    </div>
+  </div>
+  
