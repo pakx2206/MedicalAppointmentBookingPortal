@@ -13,7 +13,12 @@ export class AppComponent {
   title(title: any) {
     throw new Error('Method not implemented.');
   }
-  currentUser: any;
+  currentUser: any = null;
+
+login(user: any) {
+  this.currentUser = user;
+  console.log('Użytkownik zalogowany:', this.currentUser);
+}
 
   constructor(private router: Router) {
     this.loadCurrentUser();

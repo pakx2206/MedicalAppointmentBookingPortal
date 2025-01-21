@@ -152,34 +152,37 @@ export class AppointmentFormComponent implements OnInit {
 
   bookAppointment() {
     if (!this.selectedDay || !this.selectedHour || this.appointmentForm.invalid) {
-      console.log("Formularz nie jest poprawnie wypełniony!");
       return;
     }
-
+  
     const formattedDate = formatDate(this.selectedDay.date, 'yyyy-MM-dd', 'pl');
-
+  
+    const isDuplicate = this.appointments.some(
+      app => app.date === formattedDate && app.hour === this.selectedHour
+    );
+  
+    if (isDuplicate) {
+      alert('Nie możesz zarezerwować wizyty na ten sam termin!');
+      return;
+    }
+  
     const newAppointment = {
       date: formattedDate,
       hour: this.selectedHour,
       details: this.appointmentForm.value
     };
-
-    console.log("Zapisywanie wizyty:", newAppointment);
-
-
+  
     this.appointments.push(newAppointment);
     localStorage.setItem('appointments', JSON.stringify(this.appointments));
-
-
-    this.selectedDay.appointments = this.selectedDay.appointments.filter((h: string) => h !== this.selectedHour);
-
-
-
+    this.selectedDay.appointments = this.selectedDay.appointments.filter(
+      (h: string) => h !== this.selectedHour
+    );
+  
     this.showAppointmentForm = false;
     this.selectedHour = null;
     this.generateCalendar();
   }
-
+  
 
 
 

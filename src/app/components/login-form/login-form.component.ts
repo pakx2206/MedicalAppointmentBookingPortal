@@ -27,6 +27,7 @@ export class LoginFormComponent {
           u.email === this.loginForm.value.email &&
           u.password === this.loginForm.value.password
       );
+      window.location.reload();
 
       if (user) {
         localStorage.setItem('currentUser', JSON.stringify(user));
