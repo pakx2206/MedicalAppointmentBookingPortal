@@ -1,15 +1,70 @@
-<div class="calendar">
-    <div class="day" *ngFor="let day of daysInMonth">
-      <strong>{{ day.date | date: 'dd MMMM' }}</strong>
-      <div
-        *ngFor="let hour of hours"
-        class="hour"
-        [class.available]="!day.appointments.includes(hour + ':00')"
-        [class.booked]="day.appointments.includes(hour + ':00')"
-        (click)="bookAppointment(day.date, hour)"
-      >
-        {{ hour }}:00
+<div class="calendar-container">
+  <div class="calendar-header">
+    <button (click)="previousMonth()">&lt;</button>
+    <h2>{{ formattedMonth }}</h2>
+    <button (click)="nextMonth()">&gt;</button>
+  </div>
+
+  <div class="weekdays">
+    <div *ngFor="let day of weekdays">{{ day }}</div>
+  </div>
+
+  <div class="calendar">
+    <div class="week" *ngFor="let week of weeksInMonth">
+      <div class="day" *ngFor="let day of week" [class.available]="day && day.isAvailable"
+        [class.booked]="day && isDayFullyBooked(day.date)" (click)="selectDay(day)">
+        <strong *ngIf="day">{{ day.date | date: 'dd' }}</strong>
       </div>
     </div>
   </div>
-  
+
+  <div *ngIf="selectedDay" class="time-selection">
+    <h3>Wybierz godzinę dla dnia {{ selectedDay.date | date: 'dd MMMM yyyy' }}</h3>
+    <button *ngFor="let hour of hours" [class.booked]="isHourBooked(selectedDay.date, hour)"
+      [class.available]="!isHourBooked(selectedDay.date, hour)" [disabled]="isHourBooked(selectedDay.date, hour)"
+      (click)="selectHour(hour)">
+      {{ hour }}:00
+    </button>
+  </div>
+</div>
+
+<div *ngIf="showAppointmentForm" class="appointment-form">
+  <h3>Wypełnij szczegóły wizyty</h3>
+
+  <form [formGroup]="appointmentForm" (ngSubmit)="bookAppointment()">
+    <label>Wybierz specjalizację:</label>
+    <select formControlName="specialization">
+      <option *ngFor="let spec of specializations" [value]="spec">{{ spec }}</option>
+    </select>
+
+    <label>Wybierz lekarza:</label>
+    <select formControlName="doctor">
+      <option *ngFor="let doc of doctors[appointmentForm.get('specialization')?.value]" [value]="doc">
+        {{ doc }}
+      </option>
+    </select>
+
+    <label>Opis dolegliwości:</label>
+    <textarea formControlName="description"></textarea>
+
+    <label>Forma płatności:</label>
+    <select formControlName="paymentMethod">
+      <option value="gotowka">Gotówka</option>
+      <option value="karta">Karta</option>
+    </select>
+
+    <label>Waluta (jeśli gotówka):</label>
+    <select formControlName="currency" *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka'">
+      <option value="PLN">PLN</option>
+      <option value="EUR">EUR</option>
+      <option value="USD">USD</option>
+    </select>
+
+    <label>
+      <input type="checkbox" formControlName="agreement">
+      Zgadzam się na umówienie wizyty
+    </label>
+
+    <button type="submit" [disabled]="!appointmentForm.valid">Zapisz wizytę</button>
+  </form>
+</div>

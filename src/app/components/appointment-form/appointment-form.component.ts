@@ -1,50 +1,223 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { formatDate, registerLocaleData } from '@angular/common';
+import localePl from '@angular/common/locales/pl';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+
+registerLocaleData(localePl, 'pl');
 
 @Component({
   selector: 'app-appointment-form',
   standalone: true,
   templateUrl: './appointment-form.component.html',
   styleUrls: ['./appointment-form.component.scss'],
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule]
 })
-export class AppointmentFormComponent {
-  currentDate = new Date();
-  daysInMonth: { date: Date; appointments: string[] }[] = [];
-  hours: number[] = Array.from({ length: 9 }, (_, i) => 9 + i);
+export class AppointmentFormComponent implements OnInit {
+  currentMonth: Date = new Date();
+  formattedMonth: string = '';
+  weekdays: string[] = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'];
+  hours: string[] = ['09', '10', '11', '12', '13', '14', '15', '16'];
+  weeksInMonth: any[] = [];
+  selectedDay: any = null;
+  selectedHour: string | null = null;
+  showAppointmentForm: boolean = false;
+  appointmentForm: FormGroup;
+  appointments: { date: string; hour: string; details: any }[] = [];
 
-  constructor() {
-    this.generateDaysInMonth();
+
+  specializations = ['Kardiolog', 'Neurolog', 'Ortopeda', 'Dermatolog'];
+  doctors: { [key: string]: string[] } = {
+    Kardiolog: ['Dr. Kowalski', 'Dr. Nowak', 'Dr. Wiśniewski', 'Dr. Dąbrowski'],
+    Neurolog: ['Dr. Zieliński', 'Dr. Szymański', 'Dr. Woźniak', 'Dr. Kamiński'],
+    Ortopeda: ['Dr. Lewandowski', 'Dr. Jankowski', 'Dr. Wójcik', 'Dr. Kaczmarek'],
+    Dermatolog: ['Dr. Mazur', 'Dr. Krawczyk', 'Dr. Piotrowski', 'Dr. Grabowski']
+  };
+
+  constructor(private fb: FormBuilder) {
+    this.appointmentForm = this.fb.group({
+      specialization: ['', Validators.required],
+      doctor: ['', Validators.required],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      paymentMethod: ['', Validators.required],
+      currency: [''],
+      agreement: [false, Validators.requiredTrue]
+    });
   }
 
-  generateDaysInMonth() {
-    const year = this.currentDate.getFullYear();
-    const month = this.currentDate.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      this.daysInMonth.push({
-        date: new Date(year, month, day),
-        appointments: [],
+  ngOnInit() {
+    this.updateFormattedMonth();
+    this.loadAppointments();
+    this.generateCalendar();
+  }
+
+  updateFormattedMonth() {
+    this.formattedMonth = formatDate(this.currentMonth, 'MMMM yyyy', 'pl');
+  }
+
+  generateCalendar() {
+    let start = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), 1);
+    let end = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 0);
+    let days: any[] = [];
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      let formattedDate = formatDate(d, 'yyyy-MM-dd', 'pl');
+      let bookedHours = this.appointments
+        .filter(app => app.date === formattedDate)
+        .map(app => app.hour);
+
+      days.push({
+        date: new Date(d),
+        isAvailable: true,
+        appointments: this.hours.filter(hour => !bookedHours.includes(hour)) // Dostępne godziny
       });
     }
+
+    this.weeksInMonth = this.chunkIntoWeeks(days);
   }
 
-  bookAppointment(day: Date, hour: number) {
-    const dayKey = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
-    const storedAppointments = JSON.parse(localStorage.getItem('appointments') || '{}');
 
-    if (!storedAppointments[dayKey]) {
-      storedAppointments[dayKey] = [];
+
+  chunkIntoWeeks(days: any[]) {
+    let weeks = [];
+    let week = [];
+    let firstDayIndex = days[0].date.getDay();
+
+    for (let i = 0; i < firstDayIndex; i++) {
+      week.push(null);
     }
 
-    const timeSlot = `${hour}:00`;
-    if (!storedAppointments[dayKey].includes(timeSlot)) {
-      storedAppointments[dayKey].push(timeSlot);
-      localStorage.setItem('appointments', JSON.stringify(storedAppointments));
-      alert(`Appointment booked for ${timeSlot} on ${dayKey}`);
-    } else {
-      alert('This time slot is already booked.');
+    for (let day of days) {
+      week.push(day);
+      if (week.length === 7) {
+        weeks.push(week);
+        week = [];
+      }
+    }
+
+    if (week.length > 0) {
+      weeks.push(week);
+    }
+
+    return weeks;
+  }
+
+  getAvailableHours(date: Date) {
+    if (!Array.isArray(this.appointments)) {
+      this.appointments = [];
+    }
+
+    let formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
+
+    let availableHours = this.hours.filter(hour =>
+      !this.appointments.some(app => app.date === formattedDate && app.hour === hour)
+    );
+
+    console.log(`Dostępne godziny dla ${formattedDate}:`, availableHours);
+
+    return availableHours;
+  }
+
+
+
+  selectDay(day: any) {
+    if (!day) return;
+
+    console.log('Kliknięto dzień:', day.date);
+    console.log('Dostępne godziny:', day.appointments);
+
+    this.selectedDay = day;
+    this.selectedHour = null;
+    this.showAppointmentForm = false;
+  }
+
+
+  selectHour(hour: string) {
+    this.selectedHour = hour;
+    this.showAppointmentForm = true;
+  }
+
+  previousMonth() {
+    this.currentMonth.setMonth(this.currentMonth.getMonth() - 1);
+    this.updateFormattedMonth();
+    this.generateCalendar();
+  }
+
+  nextMonth() {
+    this.currentMonth.setMonth(this.currentMonth.getMonth() + 1);
+    this.updateFormattedMonth();
+    this.generateCalendar();
+  }
+
+  bookAppointment() {
+    if (!this.selectedDay || !this.selectedHour || this.appointmentForm.invalid) {
+      console.log("Formularz nie jest poprawnie wypełniony!");
+      return;
+    }
+
+    const formattedDate = formatDate(this.selectedDay.date, 'yyyy-MM-dd', 'pl');
+
+    const newAppointment = {
+      date: formattedDate,
+      hour: this.selectedHour,
+      details: this.appointmentForm.value
+    };
+
+    console.log("Zapisywanie wizyty:", newAppointment);
+
+
+    this.appointments.push(newAppointment);
+    localStorage.setItem('appointments', JSON.stringify(this.appointments));
+
+
+    this.selectedDay.appointments = this.selectedDay.appointments.filter((h: string) => h !== this.selectedHour);
+
+
+
+    this.showAppointmentForm = false;
+    this.selectedHour = null;
+    this.generateCalendar();
+  }
+
+
+
+
+  isHourBooked(date: Date, hour: string): boolean {
+    const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
+    return this.appointments.some(app => app.date === formattedDate && app.hour === hour);
+  }
+
+
+  isToday(date: Date): boolean {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+  }
+
+  loadAppointments() {
+    let storedAppointments = localStorage.getItem('appointments');
+
+    try {
+      this.appointments = storedAppointments ? JSON.parse(storedAppointments) : [];
+
+
+      if (!Array.isArray(this.appointments)) {
+        this.appointments = [];
+      }
+    } catch (error) {
+      console.error('Błąd podczas ładowania wizyt:', error);
+      this.appointments = [];
     }
   }
+
+  isDayFullyBooked(date: Date): boolean {
+    const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
+
+
+    const bookedAppointments = this.appointments.filter(app => app.date === formattedDate);
+    return bookedAppointments.length >= this.hours.length;
+  }
+
 }
