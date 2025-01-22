@@ -1,122 +1,180 @@
 .calendar-container {
-    width: 100%;
-    max-width: 800px;
-    margin: auto;
-    text-align: center;
+  width: 100%;
+  max-width: 50rem;
+  margin: auto;
+  text-align: center;
 
-    .calendar-header {
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.625rem;
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 0.3125rem 0.625rem;
+      cursor: pointer;
+      border-radius: 0.3125rem;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+
+  .weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-weight: bold;
+    margin-bottom: 0.3125rem;
+  }
+
+  .calendar {
+    display: grid;
+    grid-template-rows: repeat(6, auto);
+
+    .week {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+
+      .day {
+        border: 0.0625rem solid #ccc;
+        padding: 0.625rem;
+        min-height: 5rem;
+        min-width: 5rem;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        justify-content: center;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: transform 0.1s ease, background-color 0.3s ease;
 
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-
-            &:hover {
-                background-color: #0056b3;
-            }
+        &.today {
+          background-color: #ffeb3b;
         }
-    }
 
-    .weekdays {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .calendar {
-        display: grid;
-        grid-template-rows: repeat(6, auto);
-
-        .week {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-
-            .day {
-                border: 1px solid #ccc;
-                padding: 10px;
-                min-height: 80px;
-                min-width: 80px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 14px;
-                cursor: pointer;
-                transition: background 0.3s ease;
-
-                &.today {
-                    background-color: #ffeb3b;
-                }
-
-                &.available {
-                    background-color: #d4edda !important; // Zielone dni
-                }
-
-                &.unavailable {
-                    background-color: #f8d7da !important; // Czerwone dni (jeśli admin zmieni)
-                }
-            }
-
+        &.available {
+          background-color: #28a745 !important;
         }
+
+        &.booked {
+          background-color: #dc3545 !important;
+        }
+
+        &.past {
+          background-color: transparent !important;
+          color: #aaa !important;
+          pointer-events: none;
+          font-weight: bold;
+        }
+
+        &:hover {
+          filter: brightness(1.1);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+  }
+
+  .appointment-form {
+    margin-top: 1.875rem;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+
+      label {
+        font-weight: 500;
+        margin-bottom: 0.3125rem;
+      }
+
+      input,
+      textarea {
+        border: 1px solid #ccc !important;
+        font-size: 1rem !important;
+      }
+
+      .error {
+        font-size: 0.875rem !important;
+        color: red !important;
+        font-weight: normal !important;
+        margin-top: -0.3125rem;
+      }
+
+      button[type="submit"] {
+        margin-top: 1.5625rem;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        background-color: orange !important;
+      }
+    }
+  }
+
+  .time-selection {
+    margin-top: 1.25rem;
+
+    h3 {
+      margin-bottom: 0.625rem;
     }
 
     button {
-        padding: 10px;
-        margin: 5px;
-        border: none;
-        cursor: pointer;
+      margin: 0.3125rem;
+    }
+  }
+
+  .success-message {
+    background-color: #28a745;
+    color: white;
+    padding: 0.625rem;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 0.3125rem;
+    margin: 0.625rem 0;
+  }
+
+  button {
+    padding: 0.625rem;
+    margin: 0.3125rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+
+    &:hover {
+      filter: brightness(1.1);
     }
 
-    &.booked {
-        background-color: red;
-        color: white;
+    &:active {
+      transform: scale(0.95);
     }
 
     &.available {
-        background-color: green;
-        color: white;
+      background-color: #28a745;
+      color: white;
     }
 
-    button.selected {
-        background-color: orange;
-        color: white;
-        font-weight: bold;
+    &.booked {
+      background-color: #dc3545 !important;
+      color: white;
+      cursor: not-allowed;
+      opacity: 0.7;
     }
 
-
-
-    .time-selection {
-        margin-top: 20px;
-        text-align: center;
-
-        h3 {
-            margin-bottom: 10px;
-        }
-
-        .hours {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-
-            .hour {
-                background-color: #007bff;
-                color: white;
-                padding: 5px 10px;
-                border-radius: 5px;
-                cursor: pointer;
-
-                &:hover {
-                    background-color: #0056b3;
-                }
-            }
-        }
+    &.selected {
+      background-color: orange;
+      color: white;
+      font-weight: bold;
     }
+
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  }
 }

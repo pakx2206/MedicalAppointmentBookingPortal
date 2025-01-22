@@ -12,7 +12,7 @@ export const routes: Routes = [
   { path: 'profile', component: UserProfileComponent },
   { path: 'appointment', component: AppointmentFormComponent },
   { path: 'my-visits', component: MyVisitsComponent },
-  { path: '', redirectTo: 'home', pathMatch: 'full' }, // Przekierowanie do 'home'
-  { path: 'home', component: HomeComponent }, // Strona główna
-  { path: '**', redirectTo: 'home', pathMatch: 'full' } // Obsługa nieistniejących tras
+  { path: '', redirectTo: 'home', pathMatch: 'full' }, 
+  { path: 'home', component: HomeComponent }, 
+  { path: '**', redirectTo: 'home', pathMatch: 'full' } 
 ];

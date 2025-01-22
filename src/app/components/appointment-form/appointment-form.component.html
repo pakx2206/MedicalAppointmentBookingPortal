@@ -1,4 +1,8 @@
 <div class="calendar-container">
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+
   <div class="calendar-header">
     <button (click)="previousMonth()">&lt;</button>
     <h2>{{ formattedMonth }}</h2>
@@ -11,22 +15,37 @@
 
   <div class="calendar">
     <div class="week" *ngFor="let week of weeksInMonth">
-      <div class="day" *ngFor="let day of week" [class.available]="day && day.isAvailable"
-        [class.booked]="day && isDayFullyBooked(day.date)" (click)="selectDay(day)">
-        <strong *ngIf="day">{{ day.date | date: 'dd' }}</strong>
+      <div
+        class="day"
+        *ngFor="let day of week"
+        [class.available]="day && !day.isPast && day.isAvailable"
+        [class.booked]="day && !day.isPast && day.isFullyBooked"
+        [class.past]="day && day.isPast"
+        (click)="!day.isPast && selectDay(day)"
+      >
+        <strong *ngIf="day">{{ day.date | date : "dd" }}</strong>
       </div>
     </div>
   </div>
 
   <div *ngIf="selectedDay" class="time-selection">
-    <h3>Wybierz godzinę dla dnia {{ selectedDay.date | date: 'dd MMMM yyyy' }}</h3>
-    <button *ngFor="let hour of hours" [class.booked]="isHourBooked(selectedDay?.date, hour)"
-      [class.available]="!isHourBooked(selectedDay?.date, hour)" [class.selected]="selectedHour === hour"
-      [disabled]="isHourBooked(selectedDay?.date, hour)" (click)="selectHour(hour)">
-      {{ hour }}:00
+    <h3>Wybierz godzinę dla dnia {{ getFormattedDateForSelection() }}</h3>
+    <button
+      *ngFor="let hour of hours"
+      [class.available]="
+        !isHourFullyBooked(selectedDay.date, hour) &&
+        isHourInFuture(selectedDay.date, hour)
+      "
+      [class.booked]="isHourFullyBooked(selectedDay.date, hour)"
+      [class.selected]="hour === selectedHour"
+      [disabled]="
+        isHourFullyBooked(selectedDay.date, hour) ||
+        !isHourInFuture(selectedDay.date, hour)
+      "
+      (click)="selectHour(hour)"
+    >
+      {{ hour }}
     </button>
-
-
   </div>
 </div>
 
@@ -36,37 +55,111 @@
   <form [formGroup]="appointmentForm" (ngSubmit)="bookAppointment()">
     <label>Wybierz specjalizację:</label>
     <select formControlName="specialization">
-      <option *ngFor="let spec of specializations" [value]="spec">{{ spec }}</option>
+      <option
+        *ngFor="let spec of getAvailableSpecializations(selectedHour)"
+        [value]="spec"
+      >
+        {{ spec }}
+      </option>
     </select>
+    <div
+      class="error"
+      *ngIf="
+        appointmentForm.get('specialization')?.invalid &&
+        appointmentForm.get('specialization')?.touched
+      "
+    >
+      To pole jest wymagane.
+    </div>
 
     <label>Wybierz lekarza:</label>
     <select formControlName="doctor">
-      <option *ngFor="let doc of doctors[appointmentForm.get('specialization')?.value]" [value]="doc">
+      <option
+        *ngFor="
+          let doc of getAvailableDoctorsForHour(
+            selectedHour,
+            appointmentForm.get('specialization')?.value
+          )
+        "
+        [value]="doc"
+      >
         {{ doc }}
       </option>
     </select>
+    <div
+      class="error"
+      *ngIf="
+        appointmentForm.get('doctor')?.invalid &&
+        appointmentForm.get('doctor')?.touched
+      "
+    >
+      To pole jest wymagane.
+    </div>
 
     <label>Opis dolegliwości:</label>
     <textarea formControlName="description"></textarea>
+    <div
+      class="error"
+      *ngIf="
+        appointmentForm.get('description')?.invalid &&
+        appointmentForm.get('description')?.touched
+      "
+    >
+      Opis musi zawierać co najmniej 10 znaków.
+    </div>
 
     <label>Forma płatności:</label>
     <select formControlName="paymentMethod">
       <option value="gotowka">Gotówka</option>
       <option value="karta">Karta</option>
     </select>
+    <div
+      class="error"
+      *ngIf="
+        appointmentForm.get('paymentMethod')?.invalid &&
+        appointmentForm.get('paymentMethod')?.touched
+      "
+    >
+      To pole jest wymagane.
+    </div>
 
-    <label>Waluta (jeśli gotówka):</label>
-    <select formControlName="currency" *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka'">
+    <label *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka'"
+      >Waluta:</label
+    >
+    <select
+      formControlName="currency"
+      *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka'"
+    >
       <option value="PLN">PLN</option>
       <option value="EUR">EUR</option>
       <option value="USD">USD</option>
     </select>
+    <div
+      class="error"
+      *ngIf="
+        appointmentForm.get('currency')?.invalid &&
+        appointmentForm.get('currency')?.touched
+      "
+    >
+      To pole jest wymagane.
+    </div>
 
     <label>
-      <input type="checkbox" formControlName="agreement">
+      <input type="checkbox" formControlName="agreement" />
       Zgadzam się na umówienie wizyty
     </label>
+    <div
+      class="error"
+      *ngIf="
+        appointmentForm.get('agreement')?.invalid &&
+        appointmentForm.get('agreement')?.touched
+      "
+    >
+      Musisz zaakceptować warunki rezerwacji.
+    </div>
 
-    <button type="submit" [disabled]="!appointmentForm.valid">Zapisz wizytę</button>
+    <button type="submit" [disabled]="!appointmentForm.valid">
+      Zapisz wizytę
+    </button>
   </form>
 </div>
