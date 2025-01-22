@@ -20,11 +20,13 @@
 
   <div *ngIf="selectedDay" class="time-selection">
     <h3>Wybierz godzinę dla dnia {{ selectedDay.date | date: 'dd MMMM yyyy' }}</h3>
-    <button *ngFor="let hour of hours" [class.booked]="isHourBooked(selectedDay.date, hour)"
-      [class.available]="!isHourBooked(selectedDay.date, hour)" [disabled]="isHourBooked(selectedDay.date, hour)"
-      (click)="selectHour(hour)">
+    <button *ngFor="let hour of hours" [class.booked]="isHourBooked(selectedDay?.date, hour)"
+      [class.available]="!isHourBooked(selectedDay?.date, hour)" [class.selected]="selectedHour === hour"
+      [disabled]="isHourBooked(selectedDay?.date, hour)" (click)="selectHour(hour)">
       {{ hour }}:00
     </button>
+
+
   </div>
 </div>
 

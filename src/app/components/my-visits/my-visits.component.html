@@ -1,16 +1,15 @@
 <div class="visits-container">
-    <h2>Moje wizyty</h2>
-    <ul>
-      <li *ngFor="let visit of visits">
-        <p><strong>Data:</strong> {{ visit.date | date: 'longDate' }}</p>
-        <p><strong>Godzina:</strong> {{ visit.hour }}</p>
-        <p><strong>Specjalizacja:</strong> {{ visit.details.specialization }}</p>
-        <p><strong>Lekarz:</strong> {{ visit.details.doctor }}</p>
-        <p><strong>Opis dolegliwości:</strong> {{ visit.details.description }}</p>
-        <p><strong>Forma płatności:</strong> {{ visit.details.paymentMethod }}</p>
-        <p *ngIf="visit.details.paymentMethod === 'gotowka'"><strong>Waluta:</strong> {{ visit.details.currency }}</p>
-        <button (click)="cancelVisit(visit)">Odwołaj wizytę</button>
-      </li>
-    </ul>
-  </div>
-  
+  <h2>Moje wizyty</h2>
+  <ul>
+    <li *ngFor="let visit of visits">
+      <p><strong>Data:</strong> {{ visit.date | date: 'longDate' }}</p>
+      <p><strong>Godzina:</strong> {{ visit.hour }}</p>
+      <p><strong>Specjalizacja:</strong> {{ visit.details.specialization }}</p>
+      <p><strong>Lekarz:</strong> {{ visit.details.doctor }}</p>
+      <p><strong>Opis dolegliwości:</strong> {{ visit.details.description }}</p>
+      <p><strong>Forma płatności:</strong> {{ visit.details.paymentMethod }}</p>
+      <p *ngIf="visit.details.paymentMethod === 'gotowka'"><strong>Waluta:</strong> {{ visit.details.currency }}</p>
+      <button (click)="cancelVisit(visit)">Odwołaj wizytę</button>
+    </li>
+  </ul>
+</div>

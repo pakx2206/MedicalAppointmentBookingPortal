@@ -10,7 +10,8 @@ registerLocaleData(localePl, 'pl');
   selector: 'app-appointment-form',
   standalone: true,
   templateUrl: './appointment-form.component.html',
-  styleUrls: ['./appointment-form.component.scss'],
+  styleUrls: ['../appointment-form/appointment-form.component.scss']
+  ,
   imports: [CommonModule, ReactiveFormsModule]
 })
 export class AppointmentFormComponent implements OnInit {
@@ -24,7 +25,6 @@ export class AppointmentFormComponent implements OnInit {
   showAppointmentForm: boolean = false;
   appointmentForm: FormGroup;
   appointments: { date: string; hour: string; details: any }[] = [];
-
 
   specializations = ['Kardiolog', 'Neurolog', 'Ortopeda', 'Dermatolog'];
   doctors: { [key: string]: string[] } = {
@@ -41,10 +41,10 @@ export class AppointmentFormComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(10)]],
       paymentMethod: ['', Validators.required],
       currency: [''],
-      agreement: [false, Validators.requiredTrue]
+      agreement: [false, Validators.requiredTrue],
+      hour: [''] // Added hour field
     });
   }
-
 
   ngOnInit() {
     this.updateFormattedMonth();
@@ -69,15 +69,13 @@ export class AppointmentFormComponent implements OnInit {
 
       days.push({
         date: new Date(d),
-        isAvailable: true,
-        appointments: this.hours.filter(hour => !bookedHours.includes(hour)) // Dostępne godziny
+        isAvailable: bookedHours.length < this.hours.length, // If all hours booked, unavailable
+        appointments: this.hours.filter(hour => !bookedHours.includes(hour))
       });
     }
 
     this.weeksInMonth = this.chunkIntoWeeks(days);
   }
-
-
 
   chunkIntoWeeks(days: any[]) {
     let weeks = [];
@@ -103,27 +101,8 @@ export class AppointmentFormComponent implements OnInit {
     return weeks;
   }
 
-  getAvailableHours(date: Date) {
-    if (!Array.isArray(this.appointments)) {
-      this.appointments = [];
-    }
-
-    let formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
-
-    let availableHours = this.hours.filter(hour =>
-      !this.appointments.some(app => app.date === formattedDate && app.hour === hour)
-    );
-
-    console.log(`Dostępne godziny dla ${formattedDate}:`, availableHours);
-
-    return availableHours;
-  }
-
-
-
   selectDay(day: any) {
     if (!day) return;
-
     console.log('Kliknięto dzień:', day.date);
     console.log('Dostępne godziny:', day.appointments);
 
@@ -132,9 +111,9 @@ export class AppointmentFormComponent implements OnInit {
     this.showAppointmentForm = false;
   }
 
-
   selectHour(hour: string) {
     this.selectedHour = hour;
+    this.appointmentForm.patchValue({ hour: hour }); // Update form field
     this.showAppointmentForm = true;
   }
 
@@ -151,46 +130,33 @@ export class AppointmentFormComponent implements OnInit {
   }
 
   bookAppointment() {
-    if (!this.selectedDay || !this.selectedHour || this.appointmentForm.invalid) {
-      return;
-    }
-  
-    const formattedDate = formatDate(this.selectedDay.date, 'yyyy-MM-dd', 'pl');
-  
-    const isDuplicate = this.appointments.some(
-      app => app.date === formattedDate && app.hour === this.selectedHour
-    );
-  
-    if (isDuplicate) {
-      alert('Nie możesz zarezerwować wizyty na ten sam termin!');
-      return;
-    }
-  
+    if (!this.selectedDay || !this.selectedHour) return;
+
     const newAppointment = {
-      date: formattedDate,
+      date: formatDate(this.selectedDay.date, 'yyyy-MM-dd', 'pl'),
       hour: this.selectedHour,
       details: this.appointmentForm.value
     };
-  
-    this.appointments.push(newAppointment);
-    localStorage.setItem('appointments', JSON.stringify(this.appointments));
-    this.selectedDay.appointments = this.selectedDay.appointments.filter(
-      (h: string) => h !== this.selectedHour
-    );
-  
-    this.showAppointmentForm = false;
+
+    let storedAppointments = localStorage.getItem('appointments');
+    let appointments: any[] = storedAppointments ? JSON.parse(storedAppointments) : [];
+
+    appointments.push(newAppointment);
+    localStorage.setItem('appointments', JSON.stringify(appointments));
+
+    this.selectedDay.appointments = this.selectedDay.appointments.filter((h: string) => h !== this.selectedHour);
+    this.selectedDay.isAvailable = this.selectedDay.appointments.length > 0; // Mark unavailable if no more slots
+
     this.selectedHour = null;
-    this.generateCalendar();
+    this.showAppointmentForm = false;
+
+    console.log("Zapisana wizyta:", newAppointment);
   }
-  
-
-
 
   isHourBooked(date: Date, hour: string): boolean {
-    const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
+    let formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
     return this.appointments.some(app => app.date === formattedDate && app.hour === hour);
   }
-
 
   isToday(date: Date): boolean {
     const today = new Date();
@@ -201,11 +167,8 @@ export class AppointmentFormComponent implements OnInit {
 
   loadAppointments() {
     let storedAppointments = localStorage.getItem('appointments');
-
     try {
       this.appointments = storedAppointments ? JSON.parse(storedAppointments) : [];
-
-
       if (!Array.isArray(this.appointments)) {
         this.appointments = [];
       }
@@ -217,10 +180,7 @@ export class AppointmentFormComponent implements OnInit {
 
   isDayFullyBooked(date: Date): boolean {
     const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
-
-
     const bookedAppointments = this.appointments.filter(app => app.date === formattedDate);
     return bookedAppointments.length >= this.hours.length;
   }
-
 }

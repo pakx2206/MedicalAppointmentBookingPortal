@@ -74,15 +74,20 @@
         cursor: pointer;
     }
 
-    button.available {
+    &.booked {
+        background-color: red;
+        color: white;
+    }
+
+    &.available {
         background-color: green;
         color: white;
     }
 
-    button.booked {
-        background-color: red;
+    button.selected {
+        background-color: orange;
         color: white;
-        cursor: not-allowed;
+        font-weight: bold;
     }
 
 

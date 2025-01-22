@@ -16,14 +16,13 @@ export class MyVisitsComponent implements OnInit {
   }
 
   loadVisits() {
-    const storedVisits = localStorage.getItem('appointments');
+    let storedVisits = localStorage.getItem('appointments');
     if (storedVisits) {
-      this.visits = JSON.parse(storedVisits).map((visit: any) => ({
-        ...visit,
-        date: new Date(visit.date),
-      }));
+      this.visits = JSON.parse(storedVisits);
+      console.log("Załadowane wizyty:", this.visits);
     }
   }
+
 
   cancelVisit(visit: any) {
     this.visits = this.visits.filter(v => v !== visit);
