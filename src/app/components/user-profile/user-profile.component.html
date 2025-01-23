@@ -1,5 +1,54 @@
 <div class="profile-container">
-    <h1>User Profile</h1>
-    <p><strong>Name:</strong> {{ currentUser?.name }}</p>
-    <p><strong>Email:</strong> {{ currentUser?.email }}</p>
+    <div class="user-info">
+        <h2>Profil użytkownika</h2>
+        <p><strong>Imię:</strong> {{ currentUser.name }}</p>
+        <p><strong>Email:</strong> {{ currentUser.email }}</p>
+        <p><strong>Rola:</strong> {{ currentUser.role }}</p>
+    </div>
 </div>
+
+<div class="issues-container">
+    <h2>Lista zgłoszonych problemów</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Rodzaj</th>
+                <th>Opis</th>
+                <th>Priorytet</th>
+                <th>Email kontaktowy</th>
+                <th>Zrzut ekranu</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let issue of issues">
+                <td>{{ issue.id }}</td>
+                <td>{{ issue.issueType }}</td>
+                <td>{{ issue.description }}</td>
+                <td>{{ issue.priority }}</td>
+                <td>{{ issue.contactEmail }}</td>
+                <td>
+                    <img *ngIf="issue.screenshotFile" 
+                         [src]="issue.screenshotFile" 
+                         alt="Screenshot" 
+                         class="screenshot"
+                         (click)="openImage(issue.screenshotFile)">
+                    <span *ngIf="!issue.screenshotFile">Brak załącznika</span>
+                </td>
+                <td>
+                    <button class="close-btn" (click)="closeIssue(issue.id)">Zamknij problem</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="image-modal" *ngIf="selectedImage" (click)="closeImage()">
+    <div class="modal-content">
+        <img [src]="selectedImage" alt="Powiększony zrzut ekranu">
+        <button class="close-image-btn" (click)="closeImage(); $event.stopPropagation()">Zamknij</button>
+    </div>
+</div>
+
+

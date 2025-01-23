@@ -1,40 +1,122 @@
-.profile-container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-
-    h2 {
-        text-align: center;
-        margin-bottom: 20px;
+    .profile-container {
+    display: flex;
+    justify-content: center; 
+    margin: 2rem 0;
     }
 
-    ul {
-        list-style: none;
-        padding: 0;
-
-        li {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #e9ecef;
-        }
+    .user-info {
+    background: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 30rem;
     }
 
-    button {
-        width: 100%;
-        padding: 10px;
+  
+    .admin-panel {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-radius: 0.5rem;
+    }
+
+    .issues-container {
+        width: 90%; 
+        max-width: 120rem; 
+        margin: 0 auto; 
+        overflow-x: auto; 
+    }
+    
+    table {
+        width: 100%; 
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    
+    th, td {
+        padding: 1rem;
+        border: 0.1rem solid #ddd;
+        text-align: left;
+        white-space: nowrap;
+    }
+    
+    th {
+        background: #007bff;
+        color: white;
+    }
+    
+    .close-btn {
         background-color: #dc3545;
         color: white;
         border: none;
-        border-radius: 5px;
+        padding: 0.6rem 1rem;
+        border-radius: 0.3rem;
         cursor: pointer;
-
-        &:hover {
-            background-color: #c82333;
-        }
+        transition: background 0.2s;
     }
-}
+    
+    .close-btn:hover {
+        background-color: #c82333;
+    }
+    
+    .issue-item {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+    }
+  
+    .screenshot {
+        width: 5rem;
+        height: auto;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .screenshot:hover {
+        transform: scale(1.1);
+    }
+    
+    .image-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        max-width: 80%;
+        max-height: 80%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .modal-content img {
+        max-width: 100%;
+        max-height: 60vh;
+        border-radius: 0.5rem;
+    }
+    
+    .close-image-btn {
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        margin-top: 1rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    
+    

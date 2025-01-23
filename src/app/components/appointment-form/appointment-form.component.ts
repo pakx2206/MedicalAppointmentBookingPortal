@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { ChangeDetectorRef } from '@angular/core';
 
 registerLocaleData(localePl, 'pl');
 @Component({
@@ -35,7 +36,7 @@ export class AppointmentFormComponent implements OnInit {
 		Ortopeda: ['Dr. Lewandowski', 'Dr. Jankowski', 'Dr. Wójcik', 'Dr. Kaczmarek'],
 		Dermatolog: ['Dr. Mazur', 'Dr. Krawczyk', 'Dr. Piotrowski', 'Dr. Grabowski'],
 	};
-	constructor(private fb: FormBuilder, private router: Router, private http: HttpClient) {
+	constructor(private fb: FormBuilder, private router: Router, private http: HttpClient, private cdr: ChangeDetectorRef) {
 		this.appointmentForm = this.fb.group({
 			specialization: ['', Validators.required],
 			doctor: ['', Validators.required],
@@ -98,6 +99,7 @@ export class AppointmentFormComponent implements OnInit {
 		this.selectedHour = appointmentData.hour;
 	
 		localStorage.removeItem('editAppointment');
+		this.calculatePrice();
 	  }
 	}
 	
@@ -352,25 +354,40 @@ export class AppointmentFormComponent implements OnInit {
 		);
 	}
 	calculatePrice(): void {
-		const paymentMethod = this.appointmentForm.value.paymentMethod;
-		const currency = this.appointmentForm.value.currency;
-	  
+		if (!this.appointmentForm) {
+			console.error('appointmentForm is not initialized yet.');
+			return;
+		}
+	
+		const paymentMethod = this.appointmentForm.get('paymentMethod')?.value;
+		const currency = this.appointmentForm.get('currency')?.value;
+	
+		if (!paymentMethod) {
+			console.warn('Payment method is not selected yet.');
+			return;
+		}
+	
 		if (paymentMethod === 'karta' || currency === 'PLN') {
-		  this.convertedPrice = 150;
-		  this.formattedPrice = '150 PLN'; 
+			this.convertedPrice = 150;
+			this.formattedPrice = '150 PLN';
 		} else if (paymentMethod === 'gotowka' && (currency === 'USD' || currency === 'EUR')) {
-		  fetch(`http://localhost:5000/convert?currency=${currency}`)
-			.then(response => response.json())
-			.then(data => {
-			  this.convertedPrice = data[currency]; 
-			  this.formattedPrice = `${data[currency]} ${currency}`; 
-			})
-			.catch(() => {
-			  this.convertedPrice = 0;
-			  this.formattedPrice = 'Błąd pobierania kursu walut'; 
-			});
+			fetch(`http://localhost:5000/convert?currency=${currency}`)
+				.then(response => response.json())
+				.then(data => {
+					if (data && data[currency]) {
+						this.convertedPrice = data[currency];
+						this.formattedPrice = `${data[currency]} ${currency}`;
+					} else {
+						this.convertedPrice = null;
+						this.formattedPrice = 'Błąd pobierania kursu walut';
+					}
+				})
+				.catch(() => {
+					this.convertedPrice = null;
+					this.formattedPrice = 'Błąd pobierania kursu walut';
+				});
 		}
 	}
-	  
-	  
+	
+	
 }

@@ -24,6 +24,29 @@ login(user: any) {
     this.loadCurrentUser();
   }
 
+  ngOnInit() {
+    this.ensureAdminAccountExists();
+  }
+  
+  ensureAdminAccountExists(): void {
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+  
+    
+    const adminExists = users.some((user: any) => user.email === "admin@example.com");
+  
+    if (!adminExists) {
+      const adminAccount = {
+        name: "Administrator",
+        email: "admin@admin.com",
+        password: "admin123", 
+        role: "admin"
+      };
+      
+      users.push(adminAccount);
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+  }
+  
   loadCurrentUser(): void {
     if (typeof window !== 'undefined' && window.localStorage) {
       this.currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');

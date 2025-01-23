@@ -47,13 +47,16 @@ main {
 }
 
 footer {
-	height: 5vh;
-	background-color: #004085;
+	position: relative;
+	z-index: 100 !important; 
+	background-color: #003366;
 	color: white;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
+	text-align: center;
+	padding: 1rem;
+	font-size: 1rem;
+	width: 100%;
+  }
+  
 
 .navbar {
 	display: flex;
@@ -191,3 +194,39 @@ form {
 		display: block;
 	}
 }
+.modal-backdrop {
+	z-index: 1050 !important; 
+  }
+  
+  .modal-dialog {
+	z-index: 1100 !important; 
+	position: fixed;
+	top: 50% !important;
+	left: 50% !important;
+	transform: translate(-50%, -50%) !important;
+	width: 90%;
+	max-width: 40rem;
+  }
+  
+  .modal-content {
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  header {
+	padding: 1.5rem 0;
+	font-size: 1.2rem; 
+  }
+  
+  footer {
+	position: relative;
+	z-index: 100;
+	background-color: #003366;
+	color: white;
+	text-align: center;
+	padding: 1.5rem 0;
+	font-size: 1.1rem;
+	width: 100%;
+  }
+  
+  

@@ -9,27 +9,45 @@
           <option value="awaria">Awaria serwera</option>
           <option value="sugestia">Sugestia poprawy</option>
         </select>
-  
+        <div class="error" *ngIf="issueForm.get('issueType')?.invalid && issueForm.get('issueType')?.touched">
+          Rodzaj problemu jest wymagany.
+        </div>
+        
         <label>Opis problemu:</label>
         <textarea formControlName="description"></textarea>
-  
+        <div class="error" *ngIf="issueForm.get('description')?.invalid && issueForm.get('description')?.touched">
+          Opis problemu jest wymagany (min. 10 znaków).
+        </div>
+        
         <label>Priorytet:</label>
         <select formControlName="priority">
           <option value="niski">Niski</option>
           <option value="średni">Średni</option>
           <option value="wysoki">Wysoki</option>
         </select>
-  
-        <label>Dołącz zrzut ekranu:</label>
+        <div class="error" *ngIf="issueForm.get('priority')?.invalid && issueForm.get('priority')?.touched">
+          Priorytet jest wymagany.
+        </div>
+        <label>Dołącz zrzut ekranu (opcjonalnie):</label>
         <input type="file" (change)="onFileSelected($event)" accept="image/*">
-  
+        <p *ngIf="issueForm.get('screenshotFile')?.value">
+          Plik: {{ issueForm.get('screenshotFile')?.value?.name }}
+        </p>
+        
         <label>Twój email kontaktowy:</label>
         <input type="email" formControlName="contactEmail">
-  
+        <div class="error" *ngIf="issueForm.get('contactEmail')?.invalid && issueForm.get('contactEmail')?.touched">
+          Podaj poprawny adres email.
+        </div>
+        
         <label>
           <input type="checkbox" formControlName="agreeTerms">
           Akceptuję regulamin
         </label>
+        <div class="error" *ngIf="issueForm.get('agreeTerms')?.invalid && issueForm.get('agreeTerms')?.touched">
+          Musisz zaakceptować regulamin.
+        </div>
+        
   
         <div class="buttons">
           <button type="submit" [disabled]="!issueForm.valid">Wyślij zgłoszenie</button>
@@ -44,17 +62,27 @@
   <ng-template #content let-modal>
     <div class="modal-header">
       <h4 class="modal-title">Podgląd zgłoszenia</h4>
-      <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">&times;</button>
     </div>
     <div class="modal-body">
-      <p><strong>Rodzaj problemu:</strong> {{ previewData?.issueType }}</p>
-      <p><strong>Opis problemu:</strong> {{ previewData?.description }}</p>
-      <p><strong>Priorytet:</strong> {{ previewData?.priority }}</p>
-      <p><strong>Email kontaktowy:</strong> {{ previewData?.contactEmail }}</p>
-      <p><strong>Zrzut ekranu:</strong> {{ previewData?.screenshotFile?.name || 'Brak' }}</p>
+      <label>Rodzaj problemu:</label>
+      <input type="text" class="readonly-field" [value]="previewData?.issueType" readonly>
+  
+      <label>Opis problemu:</label>
+      <textarea class="readonly-field" [value]="previewData?.description" readonly></textarea>
+  
+      <label>Priorytet:</label>
+      <input type="text" class="readonly-field" [value]="previewData?.priority" readonly>
+  
+      <label>Email kontaktowy:</label>
+      <input type="text" class="readonly-field" [value]="previewData?.contactEmail" readonly>
+  
+      <label>Dołącz zrzut ekranu (opcjonalnie):</label>
+      <input type="file" (change)="onFileSelected($event)" accept="image/*">
+      <p *ngIf="selectedFile"><strong>Wybrany plik:</strong> {{ selectedFile.name }}</p>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Zamknij</button>
     </div>
   </ng-template>
+  
   
