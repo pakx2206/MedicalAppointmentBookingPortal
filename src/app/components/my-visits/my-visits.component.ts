@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router'; 
 
 @Component({
   selector: 'app-my-visits',
@@ -10,6 +11,8 @@ import { CommonModule } from '@angular/common';
 })
 export class MyVisitsComponent implements OnInit {
   visits: any[] = [];
+
+  constructor(private router: Router) {} 
 
   ngOnInit() {
     this.loadVisits();
@@ -23,9 +26,21 @@ export class MyVisitsComponent implements OnInit {
     }
   }
 
+  getVisitCost(visit: any): string {
+    if (visit.details.paymentMethod === 'karta' || visit.details.currency === 'PLN') {
+      return '150 PLN';
+    } else {
+      return `${visit.details.convertedPrice} ${visit.details.currency}`;
+    }
+  }
 
   cancelVisit(visit: any) {
     this.visits = this.visits.filter(v => v !== visit);
     localStorage.setItem('appointments', JSON.stringify(this.visits));
+  }
+
+  editAppointment(visit: any) { 
+    localStorage.setItem('editAppointment', JSON.stringify(visit));
+    this.router.navigate(['/appointment']); 
   }
 }

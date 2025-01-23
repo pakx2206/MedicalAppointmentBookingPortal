@@ -1,0 +1,60 @@
+<div class="report-container">
+    <div class="report-form-wrapper">
+      <h2>Zgłoś problem techniczny</h2>
+  
+      <form [formGroup]="issueForm" (ngSubmit)="submitForm()">
+        <label>Rodzaj problemu:</label>
+        <select formControlName="issueType">
+          <option value="błąd">Błąd w systemie</option>
+          <option value="awaria">Awaria serwera</option>
+          <option value="sugestia">Sugestia poprawy</option>
+        </select>
+  
+        <label>Opis problemu:</label>
+        <textarea formControlName="description"></textarea>
+  
+        <label>Priorytet:</label>
+        <select formControlName="priority">
+          <option value="niski">Niski</option>
+          <option value="średni">Średni</option>
+          <option value="wysoki">Wysoki</option>
+        </select>
+  
+        <label>Dołącz zrzut ekranu:</label>
+        <input type="file" (change)="onFileSelected($event)" accept="image/*">
+  
+        <label>Twój email kontaktowy:</label>
+        <input type="email" formControlName="contactEmail">
+  
+        <label>
+          <input type="checkbox" formControlName="agreeTerms">
+          Akceptuję regulamin
+        </label>
+  
+        <div class="buttons">
+          <button type="submit" [disabled]="!issueForm.valid">Wyślij zgłoszenie</button>
+          <button type="button" (click)="previewIssue(content)" [disabled]="!issueForm.valid">
+            Podgląd
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <ng-template #content let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Podgląd zgłoszenia</h4>
+      <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Rodzaj problemu:</strong> {{ previewData?.issueType }}</p>
+      <p><strong>Opis problemu:</strong> {{ previewData?.description }}</p>
+      <p><strong>Priorytet:</strong> {{ previewData?.priority }}</p>
+      <p><strong>Email kontaktowy:</strong> {{ previewData?.contactEmail }}</p>
+      <p><strong>Zrzut ekranu:</strong> {{ previewData?.screenshotFile?.name || 'Brak' }}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Zamknij</button>
+    </div>
+  </ng-template>
+  

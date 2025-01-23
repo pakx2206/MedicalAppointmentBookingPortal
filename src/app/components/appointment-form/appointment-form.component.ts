@@ -5,6 +5,8 @@ import localePl from '@angular/common/locales/pl';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+
 registerLocaleData(localePl, 'pl');
 @Component({
 	selector: 'app-appointment-form',
@@ -33,7 +35,7 @@ export class AppointmentFormComponent implements OnInit {
 		Ortopeda: ['Dr. Lewandowski', 'Dr. Jankowski', 'Dr. Wójcik', 'Dr. Kaczmarek'],
 		Dermatolog: ['Dr. Mazur', 'Dr. Krawczyk', 'Dr. Piotrowski', 'Dr. Grabowski'],
 	};
-	constructor(private fb: FormBuilder, private router: Router) {
+	constructor(private fb: FormBuilder, private router: Router, private http: HttpClient) {
 		this.appointmentForm = this.fb.group({
 			specialization: ['', Validators.required],
 			doctor: ['', Validators.required],
@@ -45,24 +47,87 @@ export class AppointmentFormComponent implements OnInit {
 		});
 	}
 	successMessage: string | null = null;
+	paymentMethod: string = 'card';  
+	currency: string = 'PLN';        
+	price: number = 150;              
+	convertedPrice: number | null = null;
+	formattedPrice: string = '150 PLN'; 
+	previouslySelectedDoctor: string | null = null; 
+
 	ngOnInit() {
-		this.updateFormattedMonth();
-		this.loadAppointments();
-		this.generateCalendar();
-		this.appointmentForm
-			.get('paymentMethod')
-			?.valueChanges.subscribe((value) => {
-				if (value !== 'gotowka') {
-					this.appointmentForm.get('currency')
-						?.setValue('');
-				}
-			});
-		if (localStorage.getItem('appointmentSuccess') === 'true') {
-			this.successMessage =
-				'✅ Twoja rezerwacja się powiodła. Sprawdź szczegóły w zakładce "Moje wizyty" ✅';
-			localStorage.removeItem('appointmentSuccess');
+	  this.updateFormattedMonth();
+	  this.loadAppointments();
+	  this.generateCalendar();
+	
+	  this.appointmentForm.get('paymentMethod')?.valueChanges.subscribe(() => this.calculatePrice());
+	  this.appointmentForm.get('currency')?.valueChanges.subscribe(() => this.calculatePrice());
+	
+	  this.appointmentForm.get('paymentMethod')?.valueChanges.subscribe((value) => {
+		if (value !== 'gotowka') {
+		  this.appointmentForm.get('currency')?.setValue('');
+		}
+		this.onPaymentMethodChange();
+	  });
+	
+	  this.appointmentForm.get('currency')?.valueChanges.subscribe(() => {
+		this.onCurrencyChange();
+	  });
+	
+	  if (localStorage.getItem('appointmentSuccess') === 'true') {
+		this.successMessage =
+		  '✅ Twoja rezerwacja się powiodła. Sprawdź szczegóły w zakładce "Moje wizyty" ✅';
+		localStorage.removeItem('appointmentSuccess');
+	  }
+
+	  const editAppointment = localStorage.getItem('editAppointment');
+	  if (editAppointment) {
+		const appointmentData = JSON.parse(editAppointment);
+	
+		this.previouslySelectedDoctor = appointmentData.details.doctor;
+	
+		this.appointmentForm.patchValue({
+		  specialization: appointmentData.details.specialization,
+		  doctor: appointmentData.details.doctor,
+		  description: appointmentData.details.description,
+		  paymentMethod: appointmentData.details.paymentMethod,
+		  currency: appointmentData.details.currency,
+		  hour: appointmentData.hour,
+		});
+	
+		this.selectedDay = { date: new Date(appointmentData.date) };
+		this.selectedHour = appointmentData.hour;
+	
+		localStorage.removeItem('editAppointment');
+	  }
+	}
+	
+	onPaymentMethodChange() {
+		if (this.appointmentForm.get('paymentMethod')?.value === 'karta') {
+		  this.currency = 'PLN';
+		  this.convertedPrice = null;
+		  this.appointmentForm.get('currency')?.setValue('');
+		} else {
+		  this.onCurrencyChange();
 		}
 	}
+	  
+	  onCurrencyChange() {
+		if (this.appointmentForm.get('currency')?.value === 'PLN') {
+		  this.convertedPrice = null;
+		} else {
+		  this.fetchConvertedPrice(this.appointmentForm.get('currency')?.value);
+		}
+	}
+	  
+	  fetchConvertedPrice(currency: string) {
+		this.http.get<{ [key: string]: number }>(`http://localhost:5000/convert?currency=${currency}`)
+		  .subscribe(response => {
+			this.convertedPrice = response[currency];  
+		  }, error => {
+			console.error("Błąd pobierania kursu walut:", error);
+		  });
+	}
+	  
 	validateForm(): void {
 		Object.keys(this.appointmentForm.controls)
 			.forEach((field) => {
@@ -196,25 +261,31 @@ export class AppointmentFormComponent implements OnInit {
 		if (!confirmBooking) {
 			return;
 		}
+	
 		const newAppointment = {
 			date: formattedDate,
 			hour: this.selectedHour,
 			doctor: this.appointmentForm.value.doctor,
-			details: this.appointmentForm.value,
+			details: {
+				...this.appointmentForm.value,
+				convertedPrice: this.convertedPrice || 150 
+			}
 		};
+	
 		let storedAppointments = localStorage.getItem('appointments');
-		let appointments: any[] = storedAppointments ?
-			JSON.parse(storedAppointments) :
-			[];
+		let appointments: any[] = storedAppointments ? JSON.parse(storedAppointments) : [];
 		appointments.push(newAppointment);
 		localStorage.setItem('appointments', JSON.stringify(appointments));
+	
 		this.loadAppointments();
 		this.generateCalendar();
 		localStorage.setItem('appointmentSuccess', 'true');
+	
 		setTimeout(() => {
 			location.reload();
 		}, 500);
 	}
+	
 	hasAvailableDoctors(date: Date, hour: string): boolean {
 		const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
 		return this.specializations.some(
@@ -222,22 +293,28 @@ export class AppointmentFormComponent implements OnInit {
 			.length > 0
 		);
 	}
-	getAvailableDoctorsForHour(
-		hour: string | null,
-		specialization: string | null
-	): string[] {
+	
+	getAvailableDoctorsForHour(hour: string | null, specialization: string | null): string[] {
 		if (!hour || !this.selectedDay || !specialization) return [];
+	  
 		const formattedDate = formatDate(this.selectedDay.date, 'yyyy-MM-dd', 'pl');
 		const bookedAppointments = this.appointments.filter(
-			(app) =>
+		  (app) =>
 			app.date === formattedDate &&
 			app.hour === hour &&
 			app.details.specialization === specialization
 		);
-		return this.doctors[specialization].filter(
-			(doc) => !bookedAppointments.some((app) => app.doctor === doc)
+	  
+		let availableDoctors = this.doctors[specialization].filter(
+		  (doc) => !bookedAppointments.some((app) => app.doctor === doc)
 		);
+		if (this.previouslySelectedDoctor && !availableDoctors.includes(this.previouslySelectedDoctor)) {
+		  availableDoctors.push(this.previouslySelectedDoctor);
+		}
+	  
+		return availableDoctors;
 	}
+	  
 	isHourFullyBooked(date: Date, hour: string): boolean {
 		const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
 		const bookedAppointments = this.appointments.filter(
@@ -274,4 +351,26 @@ export class AppointmentFormComponent implements OnInit {
 			.length > 0
 		);
 	}
+	calculatePrice(): void {
+		const paymentMethod = this.appointmentForm.value.paymentMethod;
+		const currency = this.appointmentForm.value.currency;
+	  
+		if (paymentMethod === 'karta' || currency === 'PLN') {
+		  this.convertedPrice = 150;
+		  this.formattedPrice = '150 PLN'; 
+		} else if (paymentMethod === 'gotowka' && (currency === 'USD' || currency === 'EUR')) {
+		  fetch(`http://localhost:5000/convert?currency=${currency}`)
+			.then(response => response.json())
+			.then(data => {
+			  this.convertedPrice = data[currency]; 
+			  this.formattedPrice = `${data[currency]} ${currency}`; 
+			})
+			.catch(() => {
+			  this.convertedPrice = 0;
+			  this.formattedPrice = 'Błąd pobierania kursu walut'; 
+			});
+		}
+	}
+	  
+	  
 }

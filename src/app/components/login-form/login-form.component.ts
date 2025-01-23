@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login-form',
@@ -12,7 +13,7 @@ import { CommonModule } from '@angular/common';
 export class LoginFormComponent {
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
@@ -27,17 +28,19 @@ export class LoginFormComponent {
           u.email === this.loginForm.value.email &&
           u.password === this.loginForm.value.password
       );
-      window.location.reload();
 
       if (user) {
         localStorage.setItem('currentUser', JSON.stringify(user));
-        alert(`Witamy, ${user.name}!`);
+        alert(`✅ Witamy, ${user.name}! ✅`);
         this.loginForm.reset();
+        this.router.navigate(['/home']).then(() => {
+          window.location.reload(); 
+        });
       } else {
-        alert('Niepoprawny e-mail lub hasło.');
+        alert('❌ Niepoprawny e-mail lub hasło. ❌');
       }
     } else {
-      alert('Proszę wypełnic pola poprawnie.');
+      alert('⚠️ Proszę wypełnić pola poprawnie. ⚠️');
     }
   }
 }

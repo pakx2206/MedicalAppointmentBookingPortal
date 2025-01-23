@@ -38,6 +38,6 @@ login(user: any) {
     }
     this.currentUser = null;
     this.router.navigate(['/']);
-    alert('Logged out successfully.');
+    alert('Wylogowano pomyślnie.');
   }
 }

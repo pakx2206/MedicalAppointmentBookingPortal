@@ -157,6 +157,31 @@
     >
       Musisz zaakceptować warunki rezerwacji.
     </div>
+    <p *ngIf="appointmentForm.get('paymentMethod')?.value === 'karta'">
+      Cena wizyty: <strong>150 PLN</strong>
+    </p>
+    
+    <p *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka' && appointmentForm.get('currency')?.value === 'PLN'">
+      Cena wizyty: <strong>150 PLN</strong>
+    </p>
+    
+    <p *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka' && appointmentForm.get('currency')?.value !== 'PLN'">
+      Cena wizyty: <strong>{{ convertedPrice }} {{ appointmentForm.get('currency')?.value }}</strong>
+    </p>
+    <!-- Podsumowanie wizyty (widoczne tylko, gdy formularz jest poprawnie wypełniony) -->
+    <div *ngIf="appointmentForm.valid" class="summary">
+      <h3>📝 Podsumowanie wizyty</h3>
+      <p><strong>Specjalizacja:</strong> {{ appointmentForm.value.specialization }}</p>
+      <p><strong>Lekarz:</strong> {{ appointmentForm.value.doctor }}</p>
+      <p><strong>Opis:</strong> {{ appointmentForm.value.description }}</p>
+      <p><strong>Data:</strong> {{ selectedDay?.date | date: 'dd-MM-yyyy' }}</p>
+      <p><strong>Godzina:</strong> {{ appointmentForm.value.hour }}</p>
+      <p><strong>Forma płatności:</strong> {{ appointmentForm.value.paymentMethod }}</p>
+      <p *ngIf="appointmentForm.value.paymentMethod === 'gotowka'">
+        <strong>Waluta:</strong> {{ appointmentForm.value.currency }}
+      </p>
+      <p><strong>Koszt wizyty:</strong> {{ formattedPrice }}</p>
+    </div>
 
     <button type="submit" [disabled]="!appointmentForm.valid">
       Zapisz wizytę

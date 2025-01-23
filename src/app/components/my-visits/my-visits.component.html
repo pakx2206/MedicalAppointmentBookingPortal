@@ -9,7 +9,9 @@
       <p><strong>Opis dolegliwości:</strong> {{ visit.details.description }}</p>
       <p><strong>Forma płatności:</strong> {{ visit.details.paymentMethod }}</p>
       <p *ngIf="visit.details.paymentMethod === 'gotowka'"><strong>Waluta:</strong> {{ visit.details.currency }}</p>
-      <button (click)="cancelVisit(visit)">Odwołaj wizytę</button>
+      <p><strong>Koszt wizyty:</strong> {{ getVisitCost(visit) }}</p>
+      <button type="edit" (click)="editAppointment(visit)">Edytuj</button>
+      <button type="cancel"(click)="cancelVisit(visit)">Odwołaj wizytę</button>
     </li>
   </ul>
 </div>

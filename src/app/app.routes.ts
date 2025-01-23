@@ -5,6 +5,7 @@ import { MyVisitsComponent } from './components/my-visits/my-visits.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { AppointmentFormComponent } from './components/appointment-form/appointment-form.component';
 import { HomeComponent } from './components/home/home.component';
+import { ReportIssueFormComponent } from './components/report-issue-form/report-issue-form.component';
 
 export const routes: Routes = [
   { path: 'register', component: RegistrationFormComponent },
@@ -13,6 +14,7 @@ export const routes: Routes = [
   { path: 'appointment', component: AppointmentFormComponent },
   { path: 'my-visits', component: MyVisitsComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' }, 
-  { path: 'home', component: HomeComponent }, 
+  { path: 'home', component: HomeComponent },
+  { path: 'report-issue', component: ReportIssueFormComponent },
   { path: '**', redirectTo: 'home', pathMatch: 'full' } 
 ];

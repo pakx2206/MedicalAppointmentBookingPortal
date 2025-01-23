@@ -4,6 +4,7 @@
     <a class="nav-link" routerLink="/register" *ngIf="!currentUser">Rejestracja</a>
     <a class="nav-link" *ngIf="currentUser" routerLink="/appointment">Umów wizytę</a>
     <a class="nav-link" *ngIf="currentUser" routerLink="/my-visits">Moje wizyty</a>
+    <a class="nav-link" routerLink="/report-issue">Zgłoś problem</a>
     <a class="nav-link" *ngIf="!currentUser" routerLink="/login">Logowanie</a>
     <a class="nav-link" *ngIf="currentUser" routerLink="/profile">Profil</a>
     <button class="nav-button" *ngIf="currentUser" (click)="logout()">Wyloguj</button>
