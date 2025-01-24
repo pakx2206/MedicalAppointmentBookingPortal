@@ -266,6 +266,7 @@ export class AppointmentFormComponent implements OnInit {
 			this.validateForm();
 			return;
 		}
+	
 		const formattedDate = formatDate(this.selectedDay.date, 'yyyy-MM-dd', 'pl');
 		const confirmBooking = window.confirm(
 			`Czy na pewno chcesz zapisać wizytę na ${formattedDate} o godzinie ${this.selectedHour}?`
@@ -273,6 +274,25 @@ export class AppointmentFormComponent implements OnInit {
 		if (!confirmBooking) {
 			return;
 		}
+	
+		
+		const loggedUser = localStorage.getItem('currentUser');
+		if (!loggedUser) {
+			alert("Błąd: Musisz być zalogowany, aby umówić wizytę.");
+			return;
+		}
+	
+		const user = JSON.parse(loggedUser);
+		if (!user.email) {
+			alert("Błąd: Brak adresu e-mail użytkownika.");
+			return;
+		}
+	
+		const userEmail = user.email;
+		const appointmentKey = `appointments_${userEmail}`;
+	
+		let storedAppointments = localStorage.getItem(appointmentKey);
+		let appointments: any[] = storedAppointments ? JSON.parse(storedAppointments) : [];
 	
 		const newAppointment = {
 			date: formattedDate,
@@ -284,10 +304,8 @@ export class AppointmentFormComponent implements OnInit {
 			}
 		};
 	
-		let storedAppointments = localStorage.getItem('appointments');
-		let appointments: any[] = storedAppointments ? JSON.parse(storedAppointments) : [];
 		appointments.push(newAppointment);
-		localStorage.setItem('appointments', JSON.stringify(appointments));
+		localStorage.setItem(appointmentKey, JSON.stringify(appointments));
 	
 		this.loadAppointments();
 		this.generateCalendar();
@@ -297,6 +315,10 @@ export class AppointmentFormComponent implements OnInit {
 			location.reload();
 		}, 500);
 	}
+	
+	
+	
+	
 	
 	hasAvailableDoctors(date: Date, hour: string): boolean {
 		const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');

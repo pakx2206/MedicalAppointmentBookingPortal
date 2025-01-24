@@ -16,14 +16,14 @@ export class UserProfileComponent implements OnInit {
   selectedImage: string | null = null;
 
   ngOnInit() {
-    this.loadCurrentUser();
+    this.loadUser();
     this.loadAllIssues();
   }
 
-  loadCurrentUser(): void {
-    if (typeof window !== "undefined" && window.localStorage) {
-      this.currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-      this.isAdmin = this.currentUser?.role === "admin"; 
+  loadUser() {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      this.currentUser = JSON.parse(storedUser);
     }
   }
   closeIssue(issueId: number): void {
@@ -40,9 +40,10 @@ export class UserProfileComponent implements OnInit {
       }
     }
   }
-  loadIssues(): void {
-    if (this.currentUser?.role === 'admin') {
-        this.issues = JSON.parse(localStorage.getItem('issues') || '[]');
+  loadIssues() {
+    const storedIssues = localStorage.getItem('issues');
+    if (storedIssues && this.currentUser?.role === 'admin') {
+      this.issues = JSON.parse(storedIssues);
     }
   }
   resolveIssue(index: number): void {

@@ -27,10 +27,10 @@
             </small>
 
             <label for="age">Wiek:</label>
-            <input id="age" type="number" formControlName="age" aria-label="Wiek użytkownika" required />
-            <small *ngIf="registerForm.get('age')?.invalid && registerForm.get('age')?.touched" role="alert">
-                Musisz posiadać 18 lat, aby dokonać rejestracji.
-            </small>
+                <input id="age" type="number" formControlName="age" min="0" max="120" aria-label="Wiek użytkownika" required />
+                <small *ngIf="registerForm.get('age')?.invalid && registerForm.get('age')?.touched" role="alert">
+                    Wiek musi być w przedziale 0-120 lat.
+                </small>
 
             <label for="city">Miasto:</label>
             <input id="city" type="text" formControlName="city" aria-label="Miasto użytkownika" required />
@@ -39,15 +39,15 @@
             </small>
 
             <label for="phone">Telefon kontaktowy:</label>
-            <input id="phone" type="text" formControlName="phone" aria-label="Telefon kontaktowy" required />
+            <input id="phone" type="number" formControlName="phone" aria-label="Telefon kontaktowy" required />
             <small *ngIf="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched" role="alert">
                 Podaj poprawny numer telefonu.
             </small>
 
-            <label for="terms">
+            <label class="checkbox-container" for="terms">
                 <input id="terms" type="checkbox" formControlName="terms" aria-label="Akceptacja regulaminu" required />
-                Zgadzam się na rejestrację w serwisie.
-            </label>
+                <span>Zgadzam się na rejestrację w serwisie.</span>
+            </label>            
             <small *ngIf="registerForm.get('terms')?.invalid && registerForm.get('terms')?.touched" role="alert">
                 Aby ukończyć rejestrację, musisz zaakceptować.
             </small>

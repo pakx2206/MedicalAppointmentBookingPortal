@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; 
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-my-visits',
@@ -12,19 +12,39 @@ import { Router } from '@angular/router';
 export class MyVisitsComponent implements OnInit {
   visits: any[] = [];
 
-  constructor(private router: Router) {} 
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.loadVisits();
   }
 
-  loadVisits() {
-    let storedVisits = localStorage.getItem('appointments');
-    if (storedVisits) {
-      this.visits = JSON.parse(storedVisits);
-      console.log("Załadowane wizyty:", this.visits);
-    }
+  getUserId(): string {
+    const user = JSON.parse(localStorage.getItem('loggedUser') || '{}');
+    return user?.email || 'guest'; 
   }
+
+  loadVisits() {
+    const loggedUser = localStorage.getItem('currentUser');
+    if (!loggedUser) {
+        this.visits = [];
+        return;
+    }
+
+    const user = JSON.parse(loggedUser);
+    if (!user.email) {
+        this.visits = [];
+        return;
+    }
+
+    const userEmail = user.email;
+    const appointmentKey = `appointments_${userEmail}`;
+
+    let storedVisits = localStorage.getItem(appointmentKey);
+    this.visits = storedVisits ? JSON.parse(storedVisits) : [];
+  }
+
+
+
 
   getVisitCost(visit: any): string {
     if (visit.details.paymentMethod === 'karta' || visit.details.currency === 'PLN') {
@@ -37,13 +57,14 @@ export class MyVisitsComponent implements OnInit {
   cancelVisit(visit: any) {
     const confirmation = window.confirm('Czy na pewno chcesz odwołać wizytę?');
     if (confirmation) {
+      const userId = this.getUserId();
       this.visits = this.visits.filter(v => v !== visit);
-      localStorage.setItem('appointments', JSON.stringify(this.visits));
+      localStorage.setItem(`appointments_${userId}`, JSON.stringify(this.visits));
+    }
   }
-}
 
-  editAppointment(visit: any) { 
+  editAppointment(visit: any) {
     localStorage.setItem('editAppointment', JSON.stringify(visit));
-    this.router.navigate(['/appointment']); 
+    this.router.navigate(['/appointment']);
   }
 }

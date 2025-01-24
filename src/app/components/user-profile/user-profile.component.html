@@ -4,12 +4,13 @@
         <p><strong>Imię:</strong> {{ currentUser.name }}</p>
         <p><strong>Email:</strong> {{ currentUser.email }}</p>
         <p><strong>Rola:</strong> {{ currentUser.role }}</p>
-        <p><strong>Wiek:</strong> {{ currentUser.age }}</p> <!-- NOWE POLE -->
-        <p><strong>Miasto:</strong> {{ currentUser.city }}</p> <!-- NOWE POLE -->
+        <p><strong>Wiek:</strong> {{ currentUser.age }}</p> 
+        <p><strong>Miasto:</strong> {{ currentUser.city }}</p> 
     </div>
 </div>
-<h2>Lista zgłoszonych problemów</h2>
-<div class="issues-container">
+<h2 *ngIf="currentUser?.role === 'admin'">Lista zgłoszonych problemów</h2>
+<div class="issues-container" *ngIf="currentUser?.role === 'admin'">
+
     
     
     <table role="table" aria-label="Lista zgłoszonych problemów">

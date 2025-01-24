@@ -35,7 +35,6 @@
     }
 
     input, select, textarea {
-        width: 100%;
         padding: 0.75rem;
         margin-top: 0.5rem;
         border: 2px solid #ccc;
@@ -108,8 +107,26 @@
         transform: none;
     }
 }
-
-
+.checkbox-container {
+    display: flex;
+    align-items: center;
+  
+    input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      cursor: pointer;
+    }
+  
+    span {
+      padding: 0.4rem !important;
+      font-size: 1rem !important;
+      font-weight: bold !important;
+      cursor: pointer !important;
+      line-height: 4.3 !important;
+    }
+  }
+  
+  
 @media (max-width: 868px) {
     .form-container {
         width: 95% !important;
