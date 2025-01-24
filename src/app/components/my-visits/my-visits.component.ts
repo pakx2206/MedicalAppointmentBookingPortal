@@ -43,9 +43,6 @@ export class MyVisitsComponent implements OnInit {
     this.visits = storedVisits ? JSON.parse(storedVisits) : [];
   }
 
-
-
-
   getVisitCost(visit: any): string {
     if (visit.details.paymentMethod === 'karta' || visit.details.currency === 'PLN') {
       return '150 PLN';
@@ -57,14 +54,30 @@ export class MyVisitsComponent implements OnInit {
   cancelVisit(visit: any) {
     const confirmation = window.confirm('Czy na pewno chcesz odwołać wizytę?');
     if (confirmation) {
-      const userId = this.getUserId();
-      this.visits = this.visits.filter(v => v !== visit);
-      localStorage.setItem(`appointments_${userId}`, JSON.stringify(this.visits));
+        const loggedUser = localStorage.getItem('currentUser');
+        if (!loggedUser) {
+            alert("Błąd: Musisz być zalogowany, aby usunąć wizytę.");
+            return;
+        }
+
+        const user = JSON.parse(loggedUser);
+        const userEmail = user.email;
+        const appointmentKey = `appointments_${userEmail}`;
+
+        let storedAppointments = localStorage.getItem(appointmentKey);
+        let appointments: any[] = storedAppointments ? JSON.parse(storedAppointments) : [];
+
+        appointments = appointments.filter(app => app.id !== visit.id);
+
+        localStorage.setItem(appointmentKey, JSON.stringify(appointments));
+        this.visits = appointments; 
     }
   }
 
   editAppointment(visit: any) {
+    localStorage.setItem('editAppointmentId', visit.id);
     localStorage.setItem('editAppointment', JSON.stringify(visit));
     this.router.navigate(['/appointment']);
-  }
+}
+
 }

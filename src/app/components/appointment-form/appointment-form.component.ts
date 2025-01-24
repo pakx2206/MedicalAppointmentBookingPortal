@@ -261,6 +261,15 @@ export class AppointmentFormComponent implements OnInit {
 				hourInt > today.getHours())
 		);
 	}
+	hasAvailableDoctors(date: Date, hour: string): boolean {
+		const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
+		return this.specializations.some(spec => this.getAvailableDoctorsForHour(hour, spec).length > 0);
+	}
+	isDayFullyBooked(date: Date): boolean {
+		const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
+		return this.hours.every(hour => this.isHourFullyBooked(date, hour));
+	}
+	   
 	bookAppointment() {
 		if (this.appointmentForm.invalid) {
 			this.validateForm();
@@ -275,7 +284,6 @@ export class AppointmentFormComponent implements OnInit {
 			return;
 		}
 	
-		
 		const loggedUser = localStorage.getItem('currentUser');
 		if (!loggedUser) {
 			alert("Błąd: Musisz być zalogowany, aby umówić wizytę.");
@@ -294,13 +302,22 @@ export class AppointmentFormComponent implements OnInit {
 		let storedAppointments = localStorage.getItem(appointmentKey);
 		let appointments: any[] = storedAppointments ? JSON.parse(storedAppointments) : [];
 	
+		let editAppointmentId = localStorage.getItem('editAppointmentId');
+		let newAppointmentId = editAppointmentId || this.generateUniqueId();
+	
+		if (editAppointmentId) {
+			appointments = appointments.filter(app => app.id !== editAppointmentId);
+			localStorage.removeItem('editAppointmentId'); 
+		}
+	
 		const newAppointment = {
+			id: newAppointmentId,
 			date: formattedDate,
 			hour: this.selectedHour,
 			doctor: this.appointmentForm.value.doctor,
 			details: {
 				...this.appointmentForm.value,
-				convertedPrice: this.convertedPrice || 150 
+				convertedPrice: this.convertedPrice || 150
 			}
 		};
 	
@@ -317,31 +334,36 @@ export class AppointmentFormComponent implements OnInit {
 	}
 	
 	
-	
-	
-	
-	hasAvailableDoctors(date: Date, hour: string): boolean {
-		const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
-		const bookedAppointments = this.appointments.filter(app => app.date === formattedDate && app.hour === hour);
-	
-		return this.specializations.some(spec => this.getAvailableDoctorsForHour(hour, spec).length > 0);
+	generateUniqueId(): string {
+		return Math.random().toString(36).substr(2, 9); 
 	}
 	
-	
+	isHourFullyBooked(date: Date, hour: string): boolean {
+		const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
+		const bookedAppointments = this.appointments.filter(app => app.date === formattedDate && app.hour === hour);
+		const totalDoctors = Object.values(this.doctors).flat().length;
+		return bookedAppointments.length >= totalDoctors;
+	  }
+	  
+	  
+	getAvailableSpecializations(hour: string | null): string[] {
+		if (!hour || !this.selectedDay) return [];
+		return this.specializations.filter(spec => this.getAvailableDoctorsForHour(hour, spec).length > 0);
+	}
+	  
+	  
 	getAvailableDoctorsForHour(hour: string | null, specialization: string | null): string[] {
 		if (!hour || !this.selectedDay || !specialization) return [];
 	  
 		const formattedDate = formatDate(this.selectedDay.date, 'yyyy-MM-dd', 'pl');
 		const bookedAppointments = this.appointments.filter(
-		  (app) =>
-			app.date === formattedDate &&
-			app.hour === hour &&
-			app.details.specialization === specialization
+		  (app) => app.date === formattedDate && app.hour === hour && app.details.specialization === specialization
 		);
 	  
 		let availableDoctors = this.doctors[specialization].filter(
 		  (doc) => !bookedAppointments.some((app) => app.doctor === doc)
 		);
+	  
 		if (this.previouslySelectedDoctor && !availableDoctors.includes(this.previouslySelectedDoctor)) {
 		  availableDoctors.push(this.previouslySelectedDoctor);
 		}
@@ -349,76 +371,23 @@ export class AppointmentFormComponent implements OnInit {
 		return availableDoctors;
 	}
 	  
-	isHourFullyBooked(date: Date, hour: string): boolean {
-		const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
-		const bookedAppointments = this.appointments.filter(
-			(app) => app.date === formattedDate && app.hour === hour
-		);
-		const totalDoctors = Object.values(this.doctors)
-			.flat()
-			.length;
-		const bookedDoctors = bookedAppointments.length;
-		return bookedDoctors >= totalDoctors;
-	}
-	isDayFullyBooked(date: Date): boolean {
-		return this.hours.every(hour => this.isHourFullyBooked(date, hour));
-	}
-	
-	loadAppointments() {
-		let storedAppointments = localStorage.getItem('appointments');
-		try {
-			this.appointments = storedAppointments ?
-				JSON.parse(storedAppointments) :
-				[];
-			if (!Array.isArray(this.appointments)) {
-				this.appointments = [];
-			}
-		}
-		catch (error) {
-			console.error('Błąd podczas ładowania wizyt:', error);
-			this.appointments = [];
-		}
-	}
-	getAvailableSpecializations(hour: string | null): string[] {
-		if (!hour || !this.selectedDay) return [];
-		return this.specializations.filter(
-			(spec) => this.getAvailableDoctorsForHour(hour, spec)
-			.length > 0
-		);
-	}
+	  
 	calculatePrice(): void {
-		if (!this.appointmentForm) {
-			console.error('appointmentForm is not initialized yet.');
-			return;
-		}
-	
-		const paymentMethod = this.appointmentForm.get('paymentMethod')?.value;
-		const currency = this.appointmentForm.get('currency')?.value;
-	
-		if (!paymentMethod) {
-			console.warn('Payment method is not selected yet.');
-			return;
-		}
-	
-		if (paymentMethod === 'karta' || currency === 'PLN') {
-			this.convertedPrice = 150;
-			this.formattedPrice = '150 PLN';
-		} else if (paymentMethod === 'gotowka' && (currency === 'USD' || currency === 'EUR')) {
-			fetch(`http://localhost:5000/convert?currency=${currency}`)
-				.then(response => response.json())
-				.then(data => {
-					if (data && data[currency]) {
-						this.convertedPrice = data[currency];
-						this.formattedPrice = `${data[currency]} ${currency}`;
-					} else {
-						this.convertedPrice = null;
-						this.formattedPrice = 'Błąd pobierania kursu walut';
-					}
-				})
-				.catch(() => {
-					this.convertedPrice = null;
-					this.formattedPrice = 'Błąd pobierania kursu walut';
-				});
-		}
+		
 	}
+	  
+	loadAppointments(): void {
+		const loggedUser = localStorage.getItem('currentUser');
+		if (!loggedUser) {
+		  console.error('No user logged in');
+		  return;
+		}
+		const user = JSON.parse(loggedUser);
+		const userAppointmentsKey = `appointments_${user.email}`;
+		const storedAppointments = localStorage.getItem(userAppointmentsKey);
+		this.appointments = storedAppointments ? JSON.parse(storedAppointments) : [];
+	  }
+	  
+	  
+	
 }

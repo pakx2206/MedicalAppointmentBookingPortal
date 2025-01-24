@@ -17,7 +17,9 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit() {
     this.loadUser();
-    this.loadAllIssues();
+    if (this.currentUser?.role === 'admin') {
+        this.loadIssues();
+    }
   }
 
   loadUser() {
