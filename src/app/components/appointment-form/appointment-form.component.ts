@@ -388,6 +388,4 @@ export class AppointmentFormComponent implements OnInit {
 				});
 		}
 	}
-	
-	
 }

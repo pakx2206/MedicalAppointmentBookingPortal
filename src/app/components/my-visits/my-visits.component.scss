@@ -1,7 +1,15 @@
   button[type="edit"] {
       background-color: #28a745;
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+      font-weight: bold;
     }
     
   button[type="cancel"] {
       background-color: red;
+      font-weight: bold;
     }
+
+.visits-container{
+  margin: 1rem;
+}

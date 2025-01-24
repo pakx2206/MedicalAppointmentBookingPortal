@@ -35,9 +35,12 @@ export class MyVisitsComponent implements OnInit {
   }
 
   cancelVisit(visit: any) {
-    this.visits = this.visits.filter(v => v !== visit);
-    localStorage.setItem('appointments', JSON.stringify(this.visits));
+    const confirmation = window.confirm('Czy na pewno chcesz odwołać wizytę?');
+    if (confirmation) {
+      this.visits = this.visits.filter(v => v !== visit);
+      localStorage.setItem('appointments', JSON.stringify(this.visits));
   }
+}
 
   editAppointment(visit: any) { 
     localStorage.setItem('editAppointment', JSON.stringify(visit));
