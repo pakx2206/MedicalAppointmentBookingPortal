@@ -1,13 +1,18 @@
 <header>
-  <nav class="navbar">
-    <a class="nav-link" routerLink="/">Strona główna</a>
-    <a class="nav-link" routerLink="/register" *ngIf="!currentUser">Rejestracja</a>
-    <a class="nav-link" *ngIf="currentUser" routerLink="/appointment">Umów wizytę</a>
-    <a class="nav-link" *ngIf="currentUser" routerLink="/my-visits">Moje wizyty</a>
-    <a class="nav-link" routerLink="/report-issue">Zgłoś problem</a>
-    <a class="nav-link" *ngIf="!currentUser" routerLink="/login">Logowanie</a>
-    <a class="nav-link" *ngIf="currentUser" routerLink="/profile">Profil</a>
-    <button class="nav-button" *ngIf="currentUser" (click)="logout()">Wyloguj</button>
+  <button class="hamburger-menu" (click)="toggleMenu()" aria-label="Otwórz/Zamknij menu">
+    ☰
+  </button>
+  <nav class="navbar" [class.menu-open]="menuOpen" aria-label="Główna nawigacja">
+    <a class="nav-link" routerLink="/" (click)="toggleMenu()" aria-label="Przejdź na stronę główną">Strona główna</a>
+    <a class="nav-link" routerLink="/register" *ngIf="!currentUser" (click)="toggleMenu()" aria-label="Przejdź do rejestracji">Rejestracja</a>
+    <a class="nav-link" *ngIf="currentUser" routerLink="/appointment" (click)="toggleMenu()" aria-label="Umów nową wizytę">Umów wizytę</a>
+    <a class="nav-link" *ngIf="currentUser" routerLink="/my-visits" (click)="toggleMenu()" aria-label="Zobacz swoje wizyty">Moje wizyty</a>
+    <a class="nav-link" routerLink="/report-issue" (click)="toggleMenu()" aria-label="Zgłoś problem na stronie">Zgłoś problem</a>
+    <a class="nav-link" *ngIf="!currentUser" routerLink="/login" (click)="toggleMenu()" aria-label="Przejdź do logowania">Logowanie</a>
+    <a class="nav-link" *ngIf="currentUser" routerLink="/profile" (click)="toggleMenu()" aria-label="Przejdź do profilu użytkownika">Profil</a>
+    <button class="nav-button" *ngIf="currentUser" (click)="logout(); toggleMenu()" aria-label="Wyloguj się">
+      Wyloguj
+    </button>    
   </nav>
 </header>
 
@@ -15,6 +20,6 @@
   <router-outlet></router-outlet>
 </main>
 
-<footer>
-  <p>&copy; 2025 Medical Appointment Booking Portal. Patryk Pacocha, Michał Warzocha.</p>
+<footer class="footer" role="contentinfo">
+  © 2025 Medical Appointment Booking Portal. Patryk Pacocha, Michał Warzocha.
 </footer>

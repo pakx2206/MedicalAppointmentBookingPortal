@@ -10,7 +10,7 @@ $box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 * {
 	margin: 0;
 	padding: 0;
-	box-sizing: border-box;
+	box-sizing: border-box !important;
 }
 
 body {
@@ -18,6 +18,7 @@ body {
 	color: $text-color;
 	background-color: $background-color;
 	line-height: 1.6;
+	min-height: 100vh;
 }
 
 html,
@@ -27,8 +28,16 @@ body {
 	margin: 0;
 	display: flex;
 	flex-direction: column;
+	overflow-x: hidden;
+	
 }
-
+button, a, input, select, textarea {
+	&:focus-visible {
+	  outline: 3px solid #ffcc00 !important;  
+	  box-shadow: 0 0 8px rgba(255, 204, 0, 0.8) !important; 
+	  transition: outline 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	}
+  }
 header {
 	width: 100%;
 	height: 8vh;
@@ -45,20 +54,52 @@ main {
 	justify-content: center;
 	min-height: 87vh;
 }
+.appointment-form {
+    margin-top: 2rem;
+    padding: 1rem;
+    margin-bottom: 3rem !important;
+    max-width: 40rem;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 
-footer {
-	position: relative;
-	z-index: 100 !important; 
-	color: white;
-	text-align: center;
-	font-size: 1rem;
-	width: 100%;
-  }
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 0.1rem solid #ccc;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            outline: none;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+            &:focus-visible {
+                outline: 3px solid #ffcc00;
+                box-shadow: 0 0 8px rgba(255, 204, 0, 0.6);
+            }
+        }
+    }
+}
   
-
 .navbar {
-	display: flex;
+	display: flex !important;
+	visibility: visible !important;
 	justify-content: center;
+	z-index: 100 !important;
 	gap: 1rem;
 	padding: 0.5rem 1rem;
 }
@@ -162,12 +203,18 @@ form {
 			margin-left: 0.5rem;
 		}
 	}
+	
 
 	.error {
-		color: red !important;
-		font-size: 12px !important;
-		font-weight: bold;
-		display: block;
+		color: #d32f2f !important; 
+        font-weight: bold !important;
+        font-size: 1rem !important;
+        background: rgba(255, 0, 0, 0.1) !important;
+        padding: 0.5rem !important;
+        border-radius: 4px !important;
+        display: block !important;
+        width: 100% !important;
+        text-align: left !important;
 	}
 }
 .modal-backdrop {
@@ -175,13 +222,12 @@ form {
   }
   
   .modal-dialog {
-	z-index: 1100 !important; 
+	width: 95%;
+	max-width: 32rem;
 	position: fixed;
-	top: 50% !important;
-	left: 50% !important;
-	transform: translate(-50%, -50%) !important;
-	width: 90%;
-	max-width: 40rem;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
   }
   
   .modal-content {
@@ -195,13 +241,18 @@ form {
   }
   
   footer {
-	position: relative;
-	z-index: 100;
+	width: 100%;
+	background: linear-gradient(90deg, #1E3A8A, #3B82F6);
 	color: white;
 	text-align: center;
 	padding: 1.5rem 0;
-	font-size: 1.1rem;
+	font-size: 1rem;
+	position: relative;
+	bottom: 0;
   }
+  
+  
+  
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 header, footer{
@@ -219,3 +270,67 @@ a:hover, button:hover {
     color: #60A5FA;
     transition: color 0.3s ease;
 }
+@media (max-width: 866px) {
+	header {
+		background: transparent !important; 
+		position: fixed;
+		width: 100%;
+		top: 0;
+		left: 0;
+		padding: 0.5rem 1rem;
+		display: flex;
+		justify-content: flex-end; 
+		align-items: center;
+		z-index: 1000;
+	}
+
+	.hamburger-menu {
+		display: block !important;
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		cursor: pointer;
+		z-index: 1100;
+		color: orange !important;
+		font-size: 2rem;
+	}
+
+	.navbar {
+		display: none; 
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100vh;
+		background: linear-gradient(90deg, #1E3A8A, #3B82F6);
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		z-index: 1000;
+	}
+
+	.navbar.open {
+		display: flex; 
+	}
+
+	.nav-link {
+		color: white;
+		padding: 1rem;
+		font-size: 1.2rem;
+	}
+
+	.nav-button {
+		width: 80%;
+		margin-top: 1rem;
+		padding: 1rem;
+	}
+
+	
+	body.menu-open {
+		overflow: hidden;
+	}
+}
+
+  
+  

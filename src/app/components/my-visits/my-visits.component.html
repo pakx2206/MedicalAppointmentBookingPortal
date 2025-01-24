@@ -1,17 +1,36 @@
 <div class="visits-container">
-  <h2>Moje wizyty</h2>
-  <ul>
-    <li *ngFor="let visit of visits">
-      <p><strong>Data:</strong> {{ visit.date | date: 'longDate' }}</p>
-      <p><strong>Godzina:</strong> {{ visit.hour }}</p>
+  <h1>Moje wizyty</h1>
+  <section role="list">
+    <article *ngFor="let visit of visits" role="listitem" tabindex="0">
+      <h2>Wizyta: {{ visit.date | date: 'longDate' }} o {{ visit.hour }}</h2>
       <p><strong>Specjalizacja:</strong> {{ visit.details.specialization }}</p>
       <p><strong>Lekarz:</strong> {{ visit.details.doctor }}</p>
       <p><strong>Opis dolegliwości:</strong> {{ visit.details.description }}</p>
       <p><strong>Forma płatności:</strong> {{ visit.details.paymentMethod }}</p>
-      <p *ngIf="visit.details.paymentMethod === 'gotowka'"><strong>Waluta:</strong> {{ visit.details.currency }}</p>
+      <p *ngIf="visit.details.paymentMethod === 'gotowka'">
+        <strong>Waluta:</strong> {{ visit.details.currency }}
+      </p>
       <p><strong>Koszt wizyty:</strong> {{ getVisitCost(visit) }}</p>
-      <button type="edit" (click)="editAppointment(visit)">Edytuj</button>
-      <button type="cancel"(click)="cancelVisit(visit)">Odwołaj wizytę</button>
-    </li>
-  </ul>
+
+      <div class="button-group">
+        <button
+          type="button"
+          (click)="editAppointment(visit)"
+          [attr.aria-label]="'Edytuj wizytę u ' + visit.details.doctor + ' w dniu ' + (visit.date | date: 'longDate')"
+        >
+          Edytuj
+        </button>
+      
+        <button
+          type="button"
+          (click)="cancelVisit(visit)"
+          [attr.aria-label]="'Odwołaj wizytę u ' + visit.details.doctor"
+        >
+          Odwołaj wizytę
+        </button>
+      </div>
+      
+
+    </article>
+  </section>
 </div>

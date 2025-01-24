@@ -1,46 +1,54 @@
 <div class="profile-container">
     <div class="user-info">
-        <h2>Profil użytkownika</h2>
+        <h2>👤 Profil użytkownika</h2>
         <p><strong>Imię:</strong> {{ currentUser.name }}</p>
         <p><strong>Email:</strong> {{ currentUser.email }}</p>
         <p><strong>Rola:</strong> {{ currentUser.role }}</p>
+        <p><strong>Wiek:</strong> {{ currentUser.age }}</p> <!-- NOWE POLE -->
+        <p><strong>Miasto:</strong> {{ currentUser.city }}</p> <!-- NOWE POLE -->
     </div>
 </div>
-
+<h2>Lista zgłoszonych problemów</h2>
 <div class="issues-container">
-    <h2>Lista zgłoszonych problemów</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Rodzaj</th>
-                <th>Opis</th>
-                <th>Priorytet</th>
-                <th>Email kontaktowy</th>
-                <th>Zrzut ekranu</th>
-                <th>Akcje</th>
+    
+    
+    <table role="table" aria-label="Lista zgłoszonych problemów">
+        <thead role="rowgroup">
+            <tr role="row">
+                <th scope="col">ID</th>
+                <th scope="col">Rodzaj</th>
+                <th scope="col">Opis</th>
+                <th scope="col">Priorytet</th>
+                <th scope="col">Email kontaktowy</th>
+                <th scope="col">Zrzut ekranu</th>
+                <th scope="col">Akcje</th>
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let issue of issues">
-                <td>{{ issue.id }}</td>
-                <td>{{ issue.issueType }}</td>
-                <td>{{ issue.description }}</td>
-                <td>{{ issue.priority }}</td>
-                <td>{{ issue.contactEmail }}</td>
-                <td>
+            <tbody role="rowgroup">
+                <tr *ngFor="let issue of issues" role="row">
+                    <td role="cell">{{ issue.id }}</td>
+                    <td role="cell">{{ issue.issueType }}</td>
+                    <td role="cell">{{ issue.description }}</td>
+                    <td role="cell">{{ issue.priority }}</td>
+                    <td role="cell">{{ issue.contactEmail }}</td>
                     <img *ngIf="issue.screenshotFile" 
                          [src]="issue.screenshotFile" 
                          alt="Screenshot" 
                          class="screenshot"
                          (click)="openImage(issue.screenshotFile)">
                     <span *ngIf="!issue.screenshotFile">Brak załącznika</span>
-                </td>
-                <td>
-                    <button class="close-btn" (click)="closeIssue(issue.id)">Zamknij problem</button>
-                </td>
-            </tr>
-        </tbody>
+                    <td role="cell">
+                        <button class="close-btn"
+                                (click)="closeIssue(issue.id)"
+                                (keydown.enter)="closeIssue(issue.id)"
+                                (keydown.space)="closeIssue(issue.id)"
+                                [attr.aria-label]="'Zamknij problem ID: ' + issue.id">
+                            Zamknij problem
+                        </button>
+                    </td>  
+                </tr>
+            </tbody>
     </table>
 </div>
 
@@ -50,5 +58,7 @@
         <button class="close-image-btn" (click)="closeImage(); $event.stopPropagation()">Zamknij</button>
     </div>
 </div>
+<div class="footer-spacer"></div>
+
 
 

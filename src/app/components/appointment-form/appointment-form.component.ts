@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { formatDate, registerLocaleData } from '@angular/common';
 import localePl from '@angular/common/locales/pl';
@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
+
 
 registerLocaleData(localePl, 'pl');
 @Component({
@@ -24,6 +25,7 @@ export class AppointmentFormComponent implements OnInit {
 	weeksInMonth: any[] = [];
 	selectedDay: any = null;
 	selectedHour: string | null = null;
+	@ViewChild('hourButton', { static: false }) hourButton!: ElementRef;
 	showAppointmentForm: boolean = false;
 	appointmentForm: FormGroup;
 	appointments: { date: string;hour: string;doctor: string;details: any } [] = [];
@@ -180,9 +182,10 @@ export class AppointmentFormComponent implements OnInit {
 				date: new Date(d),
 				isPast: isPast,
 				isAvailable: !isPast && availableHours.length > 0,
-				isFullyBooked: availableHours.length === 0,
+				isFullyBooked: this.isDayFullyBooked(d),
 				appointments: availableHours,
 			});
+			
 		}
 		this.weeksInMonth = this.chunkIntoWeeks(days);
 	}
@@ -207,11 +210,18 @@ export class AppointmentFormComponent implements OnInit {
 		return weeks;
 	}
 	selectDay(day: any) {
-		if (!day) return;
+		if (!day || day.isPast || day.isFullyBooked) return;
 		this.selectedDay = day;
 		this.selectedHour = null;
 		this.showAppointmentForm = false;
+	  
+		setTimeout(() => {
+		  if (this.hourButton) {
+			this.hourButton.nativeElement.focus();
+		  }
+		}, 100);
 	}
+	  
 	selectHour(hour: string) {
 		if (!this.hasAvailableDoctors(this.selectedDay.date, hour)) return;
 		this.selectedHour = hour;
@@ -290,11 +300,11 @@ export class AppointmentFormComponent implements OnInit {
 	
 	hasAvailableDoctors(date: Date, hour: string): boolean {
 		const formattedDate = formatDate(date, 'yyyy-MM-dd', 'pl');
-		return this.specializations.some(
-			(spec) => this.getAvailableDoctorsForHour(hour, spec)
-			.length > 0
-		);
+		const bookedAppointments = this.appointments.filter(app => app.date === formattedDate && app.hour === hour);
+	
+		return this.specializations.some(spec => this.getAvailableDoctorsForHour(hour, spec).length > 0);
 	}
+	
 	
 	getAvailableDoctorsForHour(hour: string | null, specialization: string | null): string[] {
 		if (!hour || !this.selectedDay || !specialization) return [];
@@ -329,8 +339,9 @@ export class AppointmentFormComponent implements OnInit {
 		return bookedDoctors >= totalDoctors;
 	}
 	isDayFullyBooked(date: Date): boolean {
-		return this.hours.every((hour) => !this.hasAvailableDoctors(date, hour));
+		return this.hours.every(hour => this.isHourFullyBooked(date, hour));
 	}
+	
 	loadAppointments() {
 		let storedAppointments = localStorage.getItem('appointments');
 		try {

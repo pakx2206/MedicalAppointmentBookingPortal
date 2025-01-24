@@ -4,32 +4,39 @@
   </div>
 
   <div class="calendar-header">
-    <button (click)="previousMonth()">&lt;</button>
+    <button class="calendar-nav-button left" (click)="previousMonth()" aria-label="Poprzedni miesiąc">&lt;</button>
     <h2>{{ formattedMonth }}</h2>
-    <button (click)="nextMonth()">&gt;</button>
+    <button class="calendar-nav-button right" (click)="nextMonth()" aria-label="Następny miesiąc">&gt;</button>
   </div>
+  
 
   <div class="weekdays">
-    <div *ngFor="let day of weekdays">{{ day }}</div>
+    <div *ngFor="let day of weekdays" aria-hidden="true">{{ day }}</div>
   </div>
 
-  <div class="calendar">
-    <div class="week" *ngFor="let week of weeksInMonth">
+  <div class="calendar" role="grid">
+    <div class="week" *ngFor="let week of weeksInMonth" role="row">
       <div
         class="day"
         *ngFor="let day of week"
         [class.available]="day && !day.isPast && day.isAvailable"
         [class.booked]="day && !day.isPast && day.isFullyBooked"
         [class.past]="day && day.isPast"
-        (click)="!day.isPast && selectDay(day)"
+        (click)="selectDay(day)"
+        (keydown.enter)="selectDay(day)" 
+        (keydown.space)="selectDay(day)"
+        [tabindex]="day && !day.isPast && !day.isFullyBooked ? '0' : '-1'"
+        role="gridcell"
+        [attr.aria-selected]="selectedDay?.date === day?.date ? 'true' : 'false'"
       >
-        <strong *ngIf="day">{{ day.date | date : "dd" }}</strong>
-      </div>
+      <strong *ngIf="day">{{ day.date | date : "dd" }}</strong>
+    </div>
+
     </div>
   </div>
-
+  
   <div *ngIf="selectedDay" class="time-selection">
-    <h3>Wybierz godzinę dla dnia {{ getFormattedDateForSelection() }}</h3>
+    <h3 id="hourSelection">Wybierz godzinę dla dnia {{ getFormattedDateForSelection() }}</h3>
     <button
       *ngFor="let hour of hours"
       [class.available]="
@@ -43,9 +50,12 @@
         !isHourInFuture(selectedDay.date, hour)
       "
       (click)="selectHour(hour)"
+      [attr.aria-label]="'Wybierz godzinę ' + hour"
+      #hourButton
     >
-      {{ hour }}
+      {{ hour }}      
     </button>
+
   </div>
 </div>
 
@@ -53,12 +63,9 @@
   <h3>Wypełnij szczegóły wizyty</h3>
 
   <form [formGroup]="appointmentForm" (ngSubmit)="bookAppointment()">
-    <label>Wybierz specjalizację:</label>
-    <select formControlName="specialization">
-      <option
-        *ngFor="let spec of getAvailableSpecializations(selectedHour)"
-        [value]="spec"
-      >
+    <label for="specialization">Wybierz specjalizację:</label>
+    <select id="specialization" formControlName="specialization" aria-labelledby="specialization">
+      <option *ngFor="let spec of getAvailableSpecializations(selectedHour)" [value]="spec">
         {{ spec }}
       </option>
     </select>
@@ -72,17 +79,9 @@
       To pole jest wymagane.
     </div>
 
-    <label>Wybierz lekarza:</label>
-    <select formControlName="doctor">
-      <option
-        *ngFor="
-          let doc of getAvailableDoctorsForHour(
-            selectedHour,
-            appointmentForm.get('specialization')?.value
-          )
-        "
-        [value]="doc"
-      >
+    <label for="doctor">Wybierz lekarza:</label>
+    <select id="doctor" formControlName="doctor" aria-labelledby="doctor">
+      <option *ngFor="let doc of getAvailableDoctorsForHour(selectedHour, appointmentForm.get('specialization')?.value)" [value]="doc">
         {{ doc }}
       </option>
     </select>
@@ -108,11 +107,11 @@
       Opis musi zawierać co najmniej 10 znaków.
     </div>
 
-    <label>Forma płatności:</label>
-    <select formControlName="paymentMethod">
-      <option value="gotowka">Gotówka</option>
-      <option value="karta">Karta</option>
-    </select>
+    <label for="paymentMethod">Forma płatności:</label>
+      <select id="paymentMethod" formControlName="paymentMethod" aria-labelledby="paymentMethod">
+        <option value="gotowka">Gotówka</option>
+        <option value="karta">Karta</option>
+      </select>
     <div
       class="error"
       *ngIf="
@@ -123,16 +122,11 @@
       To pole jest wymagane.
     </div>
 
-    <label *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka'"
-      >Waluta:</label
-    >
-    <select
-      formControlName="currency"
-      *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka'"
-    >
-      <option value="PLN">PLN</option>
-      <option value="EUR">EUR</option>
-      <option value="USD">USD</option>
+    <label *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka'" for="currency">Waluta:</label>
+    <select id="currency" formControlName="currency" *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka'" aria-labelledby="currency">
+        <option value="PLN">PLN</option>
+        <option value="EUR">EUR</option>
+        <option value="USD">USD</option>
     </select>
     <div
       class="error"
@@ -157,17 +151,19 @@
     >
       Musisz zaakceptować warunki rezerwacji.
     </div>
+
     <p *ngIf="appointmentForm.get('paymentMethod')?.value === 'karta'">
       Cena wizyty: <strong>150 PLN</strong>
     </p>
-    
+
     <p *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka' && appointmentForm.get('currency')?.value === 'PLN'">
       Cena wizyty: <strong>150 PLN</strong>
     </p>
-    
+
     <p *ngIf="appointmentForm.get('paymentMethod')?.value === 'gotowka' && appointmentForm.get('currency')?.value !== 'PLN'">
       Cena wizyty: <strong>{{ convertedPrice }} {{ appointmentForm.get('currency')?.value }}</strong>
     </p>
+
     <div *ngIf="appointmentForm.valid" class="summary">
       <h3>📝 Podsumowanie wizyty</h3>
       <p><strong>Specjalizacja:</strong> {{ appointmentForm.value.specialization }}</p>
@@ -181,8 +177,11 @@
       </p>
       <p *ngIf="formattedPrice"><strong>Koszt wizyty:</strong> {{ formattedPrice }}</p>
     </div>
+
     <button type="submit" [disabled]="!appointmentForm.valid">
       Zapisz wizytę
     </button>
   </form>
 </div>
+<div class="footer-spacer"></div>
+

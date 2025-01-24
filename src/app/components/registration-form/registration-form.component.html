@@ -8,61 +8,49 @@
 
     <ng-template #registrationFormTemplate>
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-            <label>
-                Imię:
-                <input type="text" formControlName="name" />
-                <small *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
-                    Imię jest wymagane.
-                </small>
-            </label>
+            <label for="name">Imię:</label>
+            <input id="name" type="text" formControlName="name" aria-label="Imię użytkownika" required />
+            <small *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" role="alert">
+                Imię jest wymagane.
+            </small>
 
-            <label>
-                E-mail:
-                <input type="email" formControlName="email" />
-                <small *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
-                    Podaj poprawny e-mail.
-                </small>
-            </label>
+            <label for="email">E-mail:</label>
+            <input id="email" type="email" formControlName="email" aria-label="Adres e-mail" required />
+            <small *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" role="alert">
+                Podaj poprawny e-mail.
+            </small>
 
-            <label>
-                Hasło:
-                <input type="password" formControlName="password" />
-                <small *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
-                    Hasło musi posiadać minimalnie 6 znaków.
-                </small>
-            </label>
+            <label for="password">Hasło:</label>
+            <input id="password" type="password" formControlName="password" aria-label="Hasło użytkownika" required />
+            <small *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" role="alert">
+                Hasło musi posiadać minimalnie 6 znaków.
+            </small>
 
-            <label>
-                Wiek:
-                <input type="number" formControlName="age" />
-                <small *ngIf="registerForm.get('age')?.invalid && registerForm.get('age')?.touched">
-                    Musisz posiadać 18 lat, aby dokonać rejestracji.
-                </small>
-            </label>
+            <label for="age">Wiek:</label>
+            <input id="age" type="number" formControlName="age" aria-label="Wiek użytkownika" required />
+            <small *ngIf="registerForm.get('age')?.invalid && registerForm.get('age')?.touched" role="alert">
+                Musisz posiadać 18 lat, aby dokonać rejestracji.
+            </small>
 
-            <label>
-                Miasto:
-                <input type="text" formControlName="city" />
-                <small *ngIf="registerForm.get('city')?.invalid && registerForm.get('city')?.touched">
-                    Miasto jest wymagane.
-                </small>
-            </label>
+            <label for="city">Miasto:</label>
+            <input id="city" type="text" formControlName="city" aria-label="Miasto użytkownika" required />
+            <small *ngIf="registerForm.get('city')?.invalid && registerForm.get('city')?.touched" role="alert">
+                Miasto jest wymagane.
+            </small>
 
-            <label>
-                Telefon kontaktowy:
-                <input type="text" formControlName="phone" />
-                <small *ngIf="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched">
-                    Podaj poprawny numer telefonu.
-                </small>
-            </label>
+            <label for="phone">Telefon kontaktowy:</label>
+            <input id="phone" type="text" formControlName="phone" aria-label="Telefon kontaktowy" required />
+            <small *ngIf="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched" role="alert">
+                Podaj poprawny numer telefonu.
+            </small>
 
-            <label>
-                <input type="checkbox" formControlName="terms" />
+            <label for="terms">
+                <input id="terms" type="checkbox" formControlName="terms" aria-label="Akceptacja regulaminu" required />
                 Zgadzam się na rejestrację w serwisie.
-                <small *ngIf="registerForm.get('terms')?.invalid && registerForm.get('terms')?.touched">
-                    Aby ukończyć rejestrację, musisz zaakceptować.
-                </small>
             </label>
+            <small *ngIf="registerForm.get('terms')?.invalid && registerForm.get('terms')?.touched" role="alert">
+                Aby ukończyć rejestrację, musisz zaakceptować.
+            </small>
 
             <button type="submit" [disabled]="registerForm.invalid">Zarejestruj</button>
         </form>

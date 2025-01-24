@@ -1,59 +1,77 @@
-# MedicalAppointmentBookingPortal
+# Medical Appointment Booking Portal
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.7.
+## 📌 Wymagania systemowe
 
-## Development server
+Przed rozpoczęciem pracy upewnij się, że masz zainstalowane następujące oprogramowanie:
 
-To start a local development server, run:
+- **Node.js** (zalecana wersja: 18+)
+- **Angular CLI** (zalecana wersja: 17+)
+- **Python** (zalecana wersja: 3.10+)
 
-```bash
-ng serve
-```
+## 🚀 Instalacja i uruchomienie projektu
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Frontend (Angular)
 
-## Code scaffolding
+1. **Zainstaluj Angular CLI** (jeśli jeszcze nie masz):
+   ```bash
+   npm install -g @angular/cli
+   ```
+2. **Klonowanie repozytorium**:
+   ```bash
+   git clone https://github.com/pakx2206/MedicalAppointmentBookingPortal.git
+   cd MedicalAppointmentBookingPortal
+   ```
+3. **Instalacja zależności**:
+   ```bash
+   npm install
+   ```
+4. **Uruchomienie serwera deweloperskiego**:
+   ```bash
+   ng serve
+   ```
+5. **Aplikacja powinna być dostępna pod adresem:**
+   ```
+   http://localhost:4200/
+   ```
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Backend (Python/Flask)
 
-```bash
-ng generate component component-name
-```
+1. **Zainstaluj wymagane pakiety Pythona**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Uruchomienie backendu**:
+   ```bash
+   python app.py
+   ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 📖 Opis projektu
 
-```bash
-ng generate --help
-```
+Projekt **Medical Appointment Booking Portal** to aplikacja SPA umożliwiająca rezerwację wizyt lekarskich. Jest zgodna ze standardami **WCAG 2.1**, co zapewnia dostępność dla osób niewidomych.
 
-## Building
+### 🔹 Główne funkcjonalności:
 
-To build the project run:
+✅ Rejestracja i logowanie użytkowników
 
-```bash
-ng build
-```
+✅ Wybór specjalizacji i lekarza
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+✅ Przegląd i edycja zapisanych wizyt
 
-## Running unit tests
+✅ Obsługa płatności gotówką/kartą oraz walut obcych
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+✅ Formularz zgłaszania problemów z załącznikami
 
-```bash
-ng test
-```
+✅ Responsywność i zgodność z WCAG 2.1
 
-## Running end-to-end tests
+### 🎨 Technologie użyte w projekcie:
 
-For end-to-end (e2e) testing, run:
+- **Angular** – frontend
+- **TypeScript** – język programowania
+- **SCSS** – zaawansowane stylowanie
+- **Python (Flask)** – backend
+- **LocalStorage** – przechowywanie danych klienta
 
-```bash
-ng e2e
-```
+---
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+🏆 **Projekt zrealizowany w ramach zajęć Pracownia Programowania 5 i został stworzony przez: Patryk Pacocha i Michał Warzocha.**
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

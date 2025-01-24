@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, NgModule, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
 @Component({
@@ -8,6 +8,7 @@ import { CommonModule } from "@angular/common";
   templateUrl: "./user-profile.component.html",
   styleUrls: ["./user-profile.component.scss"],
 })
+
 export class UserProfileComponent implements OnInit {
   currentUser: any = null;
   isAdmin: boolean = false;
